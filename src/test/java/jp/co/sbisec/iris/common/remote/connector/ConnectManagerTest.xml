@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE iris>
+<root>
+	<web-app>
+		<service-path>com.lavans.lacoder2.remote.servlet</service-path>
+	</web-app>
+
+	<di>
+	    <bean id="com.lavans.lacoder2.http.SimpleHttpClient"
+	        class="com.lavans.lacoder2.remote.connector.mock.MockSimpleHttpClient">
+	    </bean>
+	</di>
+	<!-- Application server group -->
+	<self-node>server3</self-node>
+	<server-group name="ordered-group" selector="ordered">
+		<server-node name="server1" uri="http://127.0.0.1:8080/o/" />
+		<server-node name="server2" uri="http://127.0.0.2:8080/o/" />
+		<server-node name="server3" uri="http://127.0.0.3:8080/o/" />
+		<server-node name="server4" uri="http://127.0.0.4:8080/o/" />
+	</server-group>
+	<server-group name="roundrobin-group" selector="roundrobin">
+		<server-node name="server1" uri="http://127.0.0.1:8080/r/" />
+		<server-node name="server2" uri="http://127.0.0.2:8080/r/" />
+		<server-node name="server3" uri="http://127.0.0.3:8080/r/" />
+		<server-node name="server4" uri="http://127.0.0.4:8080/r/" />
+	</server-group>
+	<server-group name="all-group" selector="all">
+		<server-node name="server1" uri="http://127.0.0.1:8080/a/" />
+		<server-node name="server2" uri="http://127.0.0.2:8080/a/" />
+		<server-node name="server3" uri="http://127.0.0.3:8080/a/" />
+		<server-node name="server4" uri="http://127.0.0.4:8080/a/" />
+	</server-group>
+	<server-group name="others-group" selector="others">
+		<server-node name="server1" uri="http://127.0.0.1:8080/ot/" />
+		<server-node name="server2" uri="http://127.0.0.2:8080/ot/" />
+		<server-node name="server3" uri="http://127.0.0.3:8080/ot/" />
+		<server-node name="server4" uri="http://127.0.0.4:8080/ot/" />
+	</server-group>
+</root>

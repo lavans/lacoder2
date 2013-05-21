@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE luz>
+<root>
+
+    <di>
+        
+    </di>
+	<bean id="com.lavans.relay.model.runtime.CommandExecutor"  class="test.com.lavans.relay.model.runtime.CommandExecutorDummy" />
+	<beans group="service" package="com.lavans.relay.service">
+		<!-- if id and class is same, you do not need to write here. -->
+		<!-- <bean id="SampleService" class="SampleService" /> -->
+	</beans>
+
+	<!-- Application server group -->
+	<server-group name="news-bl" selector="ordered">
+		<server-node name="server1" uri="http://127.0.0.1:8080/iris-news-bl/remote" />
+	</server-group>
+
+	<parameter name="postfix.config.path" value="c:/etc/postfix/"/>
+	<parameter name="GCTimer.show" value="false"/>
+</root>

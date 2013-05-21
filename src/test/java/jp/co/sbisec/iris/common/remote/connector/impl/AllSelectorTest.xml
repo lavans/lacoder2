@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE iris>
+<root>
+	<di>
+	    <bean id="com.lavans.lacoder2.http.SimpleHttpClient"
+	        class="com.lavans.lacoder2.remote.connector.mock.MockSimpleHttpClient">
+	    </bean>
+	</di>
+	<server-group name="all-group" selector="all">
+		<server-node name="server1" uri="http://127.0.0.1:8080/a/" />
+		<server-node name="server2" uri="http://127.0.0.2:8080/a/" />
+		<server-node name="server3" uri="http://127.0.0.3:8080/a/" />
+		<server-node name="server4" uri="http://127.0.0.4:8080/a/" />
+	</server-group>
+</root>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE iris-authentication>
+<root>
+
+	<!-- Hash parameters for the Iris authentication -->
+	<parameter name="algorithm"  value="SHA-1"/>
+
+	<parameter name="str1"  value="161df8abb44fb3e3ce17"/>
+	<parameter name="str2"  value="SBISecurities"/>
+	<parameter name="str3"  value="035d6b8afcffcd304180"/>
+
+	<parameter name="real"  value="6be0753c74"/>
+	<parameter name="delay" value="af6b21591d"/>
+
+</root>

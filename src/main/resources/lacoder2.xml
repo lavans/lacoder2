@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE luz>
+<root>
+    <!-- TODO ConfigFile指定 -->
+	<web-app>
+		<service-path>com.lavans.lacoder2.remote.servlet</service-path>
+	</web-app>
+
+	
+	<parameter name="debug" value="true"/>
+</root>

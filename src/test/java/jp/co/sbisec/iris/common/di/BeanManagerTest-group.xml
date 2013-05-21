@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE luz>
+<root>
+
+			<bean id ="Bean"
+			      class="com.lavans.lacoder2.di.mock.BeanImpl" />
+    	<di>
+		<group name="mock" package="com.lavans.lacoder2.di.mock">
+			<bean id ="Bean"
+			      class="com.lavans.lacoder2.di.mock.BeanImpl" />
+		</group>
+	</di>
+</root>

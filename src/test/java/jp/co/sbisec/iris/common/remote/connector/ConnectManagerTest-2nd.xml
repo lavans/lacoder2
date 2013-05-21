@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE iris>
+<root>
+	<di>
+	    <bean id="com.lavans.lacoder2.http.SimpleHttpClient"
+	        class="com.lavans.lacoder2.remote.connector.mock.MockSimpleHttpClient2nd">
+	    </bean>
+	</di>
+</root>
