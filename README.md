@@ -10,11 +10,11 @@ lacoder2
  * 分散オブジェクト(remoteパッケージ)
  * Webアプリ自動生成(lacoder-generator)
 
-== News 更新情報 ==
+## News 更新情報
  * 2011/04/28 luz2->lacoder名称統合
  * 2011/02/08 Wiki着手
 
-== ドキュメント ==
+## ドキュメント 
  * [ポリシー](https://github.com/lavans/lacoder2/wiki/ポリシー)
  * [wiki:アーキテクチャ概要]
  * [wiki:動かしてみよう]
@@ -29,12 +29,12 @@ lacoder2
  * [wiki:用語集]
  * [wiki:TODO]
 
-=== 設定ファイルリファレンス ===
+### 設定ファイルリファレンス 
  * [wiki:lacoder.xml]
  * [wiki:lacoder-generator.xml]
  * [wiki:entity.xml]
  * [wiki:dao.xml]
-=== tagfileリファレンス ===
+### tagfileリファレンス 
  * [wiki:checkbox.tag]
  * [wiki:errors.tag]
  * [wiki:pager.tag]
@@ -44,7 +44,7 @@ lacoder2
  * [wiki:selectArray.tag]
  * [wiki:utils.tag]
 
-== メンバー ==
+## メンバー 
 <table>
 <tr>
 <th>名前</th>
@@ -57,7 +57,7 @@ lacoder2
 </table>
 
 
-== 略歴 ==
+## 略歴 
 <table>
 <tr>
 <td>2000年</td>
@@ -110,7 +110,7 @@ lacoder2
 </table>
 
 
-== SVNリポジトリ ==
+## SVNリポジトリ 
 svn://lakshmi/home/svn/lavans/trunk/luz2
 
 この Wiki ページの完全なリストは、 TitleIndex をご覧下さい。
