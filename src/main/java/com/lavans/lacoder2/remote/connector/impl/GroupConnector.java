@@ -8,8 +8,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.arnx.jsonic.JSON;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,6 +18,7 @@ import com.lavans.lacoder2.http.HttpResponse;
 import com.lavans.lacoder2.remote.connector.Connector;
 import com.lavans.lacoder2.remote.connector.Selector;
 import com.lavans.lacoder2.remote.node.ServerGroup;
+import com.lavans.lacoder2.remote.servlet.ObjectSerializer;
 import com.lavans.lacoder2.remote.servlet.RemoteInvoker;
 
 
@@ -47,30 +46,31 @@ public class GroupConnector implements Connector{
 	 * @return java.util.Map 接続先urlと結果Objectを格納。
 	 * getCustomer
 	 */
-	public String execute(Method method, Object[] args){
+	@Override
+	public Object execute(Method method, Object[] args){
 		String url = invoker.toUrl(method);
 		Map<String, String> postData = invoker.makePostData(args);
 		// 結果を格納するリスト
-		Map<String, String> resultMap = new LinkedHashMap<>(group.getOnlineList().size());
+		Map<String, Object> resultMap = new LinkedHashMap<>(group.getOnlineList().size());
 		List<ServerConnectInfo> infoList;
 		infoList = selector.getClients(group, url, postData);
-		
+
 		for(ServerConnectInfo info: infoList){
+			String methodStr = info.serverNode.getUri() + method.getDeclaringClass().getSimpleName()+"#"+method.getName();
 			try {
 				HttpResponse response = info.client.request();
-				String result = response.getContents();
-
+				Object result = ObjectSerializer.deserialize(response.getContents());
 				// 結果を格納
 				resultMap.put(info.serverNode.getName(), result);
-				logger.info("remote execute["+ info.serverNode.getUri() +"] return [" + result +"]");
+				logger.info("remote execute["+ methodStr+"] return [" + result +"]");
 			} catch (Exception e) {
 				resultMap.put(info.serverNode.getName(), ERROR);
-				logger.info( "remote execute failed.["+ info.serverNode.getUri() +"]", e);
+				logger.info( "remote execute failed.["+ methodStr +"]", e);
 			}
 		}
-		return JSON.encode(resultMap);
+		return resultMap;
 	}
-	
+
 	@Override
 	public void setServerGroup(ServerGroup group) {
 		this.group = group;
@@ -80,7 +80,7 @@ public class GroupConnector implements Connector{
 	public void setSelector(Selector selector) {
 		this.selector = selector;
 	}
-	
+
 	@Override
 	public String toString(){
 		logger.info("GroupConnector");

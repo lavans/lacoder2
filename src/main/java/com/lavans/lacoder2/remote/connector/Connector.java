@@ -13,8 +13,8 @@ public interface Connector {
 	 * @param args Method arguments.
 	 * @return
 	 */
-	String execute(Method method, Object[] args);
-	
+	Object execute(Method method, Object[] args);
+
 	void setSelector(Selector selector);
 	void setServerGroup(ServerGroup group);
 }

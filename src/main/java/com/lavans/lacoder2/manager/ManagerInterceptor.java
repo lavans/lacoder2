@@ -31,22 +31,14 @@ public class ManagerInterceptor implements MethodInterceptor,InvocationHandler{
 	public ManagerInterceptor(String groupName, String nodeName){
 		connector = getConnector(groupName, nodeName);
 	}
-	
+
 	@Override
 	public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable {
-		Stopwatch stopwatch=null;
-		String json = connector.execute(method, args);
-		if(logger.isDebugEnabled()){
-			stopwatch = new Stopwatch().start();
-		}
-		Object out = JSON.decode(json, method.getReturnType());
-		if(logger.isDebugEnabled()){
-			logger.debug("decode time:"+PeriodUtils.prettyFormat(stopwatch.stop().elapsed(TimeUnit.MILLISECONDS)));
-		}
+		Object out = connector.execute(method, args);
 		return out;
 	}
-	
-	
+
+
 	@Override
 	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 		return intercept(proxy, method, args, null);

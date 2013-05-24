@@ -18,6 +18,7 @@ import com.lavans.lacoder2.http.HttpResponse;
 import com.lavans.lacoder2.remote.connector.Connector;
 import com.lavans.lacoder2.remote.connector.Selector;
 import com.lavans.lacoder2.remote.node.ServerGroup;
+import com.lavans.lacoder2.remote.servlet.ObjectSerializer;
 import com.lavans.lacoder2.remote.servlet.RemoteInvoker;
 
 
@@ -45,22 +46,24 @@ public class SingleConnector implements Connector{
 	 * getCustomer
 	 */
 	@Override
-	public String execute(Method method, Object[] args){
+	public Object execute(Method method, Object[] args){
 		String url = invoker.toUrl(method);
 		Map<String, String> postData = invoker.makePostData(args);
+		List<ServerConnectInfo> infoList = selector.getClients(group, url, postData);
+		ServerConnectInfo info = infoList.get(0);
+		String methodStr = info.serverNode.getUri() + method.getDeclaringClass().getSimpleName()+"#"+method.getName();
 		try{
-			List<ServerConnectInfo> infoList = selector.getClients(group, url, postData);
-			ServerConnectInfo info = infoList.get(0);
 			HttpResponse response = info.client.request();
-			String result = response.getContents();
+			Object result = ObjectSerializer.deserialize(response.getContents());
 			// ログへ出力
-			logger.info("Remote execute["+ info.serverNode.getName() +"]["+ info.serverNode.getUri() +"] return [" + result +"]");
+			logger.info("Remote execute["+ methodStr +"] return [" + result +"]");
 			return result;
 		}catch (IOException e) {
+			logger.info("Remote execute["+ methodStr +"] error"+ e.getMessage());
 			throw new RuntimeException(e);
 		}
 	}
-	
+
 	@Override
 	public void setServerGroup(ServerGroup group) {
 		this.group = group;
@@ -70,7 +73,7 @@ public class SingleConnector implements Connector{
 	public void setSelector(Selector selector) {
 		this.selector = selector;
 	}
-	
+
 	@Override
 	public String toString(){
 		return getClass().getSimpleName()

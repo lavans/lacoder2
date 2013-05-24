@@ -3,7 +3,11 @@
  */
 package com.lavans.lacoder2.remote.servlet;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.concurrent.TimeUnit;
@@ -14,7 +18,14 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import lombok.Cleanup;
+import lombok.Data;
 
+
+import net.arnx.jsonic.JSON;
+import net.arnx.jsonic.util.Base64;
+
+import org.junit.ClassRule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -22,6 +33,7 @@ import org.slf4j.MDC;
 import com.google.common.base.Stopwatch;
 import com.lavans.lacoder2.controller.util.WriteUtils;
 import com.lavans.lacoder2.di.BeanManager;
+import com.lavans.lacoder2.lang.ClassUtils;
 import com.lavans.lacoder2.util.Config;
 
 /**
@@ -38,17 +50,17 @@ public class RemoteServlet extends HttpServlet {
 	/** logger */
 	private static final Logger logger = LoggerFactory.getLogger(RemoteServlet.class.getName());
 
-	private static final String ENCODING_ORG="ISO-8859-1"; 
-	private static final String ENCODING_JSON="UTF-8"; 
+	private static final String ENCODING_ORG="ISO-8859-1";
+	private static final String ENCODING_JSON="UTF-8";
 	/** invoker */
 	private RemoteInvoker invoker = BeanManager.getBean(RemoteInvoker.class);
 
 	/**
 	 * GET method.
 	 * Just write message. Do not invoke remote method.
-	 * 
+	 *
 	 * デバッグ時はgetも有効です。
-	 * 
+	 *
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
@@ -61,7 +73,7 @@ public class RemoteServlet extends HttpServlet {
 			os.flush();
 		}
 	}
-	
+
 	private String adujstEncode(String str){
 		logger.debug(str);
 		try {
@@ -75,7 +87,7 @@ public class RemoteServlet extends HttpServlet {
 	/**
 	 * POST method.
 	 * リモート受付。受け付けたjsonからservice,method,inを取り出して実行し、outをjsonで返す。
-	 * 
+	 *
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
@@ -83,20 +95,32 @@ public class RemoteServlet extends HttpServlet {
 
 		Stopwatch stopwatch = new Stopwatch();
 		stopwatch.start();
-		
+
 		// request parameter
 		request.setCharacterEncoding(ENCODING_JSON);
 		// invoke
 		String pathInfo = request.getPathInfo();
-		String json = adujstEncode(request.getParameter("json"));
-		String data = invoker.invoke(pathInfo, json);
-		
+//		String parameterTypesStr = adujstEncode(request.getParameter("parameterTypes"));
+		String argsStr = adujstEncode(request.getParameter("args"));
+//		logger.debug("parameterTypes: "+ parameterTypesStr+ ": args"+ argsStr);
+//		Class<?>[] parameterTypes = JSON.decode(parameterTypesStr, new Class<?>[]{}.getClass());
+//		String[] argsStrs = argsStr.substring(1, argsStr.length()-1).split(",");
+		Object args[] = ObjectSerializer.deserialize(argsStr);
+
+//				new Object[parameterTypes.length];
+//		for(int i=0; i<parameterTypes.length; i++){
+//			args[i] = JSON.decode("["+argsStrs[i]+"]", parameterTypes[i]);
+//		}
+//		Object args = JSON.decode(argsStr, parameterTypes);
+		String data = invoker.invoke(pathInfo, ClassUtils.toClass(args), args);
+
+
 		// Write response
 		WriteUtils writeUtils = BeanManager.getBean(WriteUtils.class);
 		writeUtils.writeJson(response, data);
-		
+
 		// log
 		stopwatch.stop();
-		logger.info(pathInfo+" "+ stopwatch.elapsed(TimeUnit.MILLISECONDS)+"ms "+json);
+		logger.info(pathInfo+" "+ stopwatch.elapsed(TimeUnit.MILLISECONDS)+"ms "+argsStr);
 	}
 }

@@ -77,29 +77,33 @@ public class ServiceManager { // implements ServiceManager{
 	/**
 	 * Get for local service with Transactional annotation
 	 */
-	public static Object getServiceLocal(String group, String id) {
+	public static <T> T getServiceLocal(String group, String id) {
 		return getServiceLocal(BeanManager.toFullId(group, id));
 	}
-	
+
 	/**
 	 * Get for local service with Transactional annotation
 	 *
 	 * @param id
 	 * @return
 	 */
-	public static Object getServiceLocal(String id) {
+	public static <T> T getServiceLocal(Class<?> clazz) {
+		return getServiceLocal(clazz.getName());
+	}
+	@SuppressWarnings("unchecked")
+	public static <T> T getServiceLocal(String id) {
 		// search from cache
 		Object service = serviceMap.get(id);
 		// If service is found, return cache.
 		if(service!=null){
-			return service;
+			return (T)service;
 		}
 		// If the service is not cached then create new one.
 		Class<? extends Object> clazz = BeanManager.getBeanClass(id);
 
 		service = createService(clazz, new TransactionInterceptor());
 		serviceMap.put(id, service);
-		return service;
+		return (T)service;
 	}
 
 	/**
@@ -115,7 +119,7 @@ public class ServiceManager { // implements ServiceManager{
 		enhancer.setSuperclass(clazz);
 		enhancer.setCallback(callback);
 		Object service = enhancer.create();
-		
+
 		return service;
 	}
 }

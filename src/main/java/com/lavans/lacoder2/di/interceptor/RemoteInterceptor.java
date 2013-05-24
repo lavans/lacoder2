@@ -3,7 +3,6 @@ package com.lavans.lacoder2.di.interceptor;
 
 import java.lang.reflect.Method;
 
-import net.arnx.jsonic.JSON;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
 
@@ -25,9 +24,12 @@ public class RemoteInterceptor implements MethodInterceptor{
 	public RemoteInterceptor(ServerGroup serverGroup){
 		this.serverGroup = serverGroup;
 	}
-	
+
 	@Override
 	public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable {
+		if(isLocalOnly(method)){
+			return method.invoke(obj, args);
+		}
 		// Remote execute
 		Connector connector = connectManager.getConnector(serverGroup);
 		if(connector == null){
@@ -35,8 +37,25 @@ public class RemoteInterceptor implements MethodInterceptor{
 			return null;
 		}
 
-		Object json = connector.execute(method, args);
-		Object out = JSON.decode((String)json, method.getReturnType());
-		return out;
+		return connector.execute(method, args);
+//		Object json = connector.execute(method, args);
+//		Object out = JSON.decode((String)json, method.getReturnType());
+//		return out;
+	}
+
+	private static final String FINALIZE="finalize";
+	/**
+	 * Check if method is local only or remote method.
+	 *
+	 * @param method
+	 * @return true: local
+	 * 			 false: remote
+	 */
+	private boolean isLocalOnly(Method method){
+		if(method.getName().equals(FINALIZE)){
+			return true;
+		}
+
+		return false;
 	}
 }
