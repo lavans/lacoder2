@@ -16,18 +16,18 @@ lacoder2
 
 ## ドキュメント 
  * [ポリシー](https://github.com/lavans/lacoder2/wiki/ポリシー)
- * [wiki:アーキテクチャ概要]
- * [wiki:動かしてみよう]
+ * [アーキテクチャ概要](https://github.com/lavans/lacoder2/wiki/アーキテクチャ概要)
+ * [動かしてみよう](https://github.com/lavans/lacoder2/wiki/動かしてみよう)
  * [wiki:アーキテクチャ詳細](optional)
- * [wiki:フォルダ構成]
- * [wiki:XMLReader]
- * [wiki:DBManager]
- * [wiki:DIContainer]
- * [wiki:RemoteProcedureCall]
- * [wiki:拡張子について]
- * [wiki:jspテンプレート]
- * [wiki:用語集]
- * [wiki:TODO]
+ * [フォルダ構成](https://github.com/lavans/lacoder2/wiki/フォルダ構成)
+ * [XMLReader](https://github.com/lavans/lacoder2/wiki/XMLReader)
+ * [DBManager](https://github.com/lavans/lacoder2/wiki/DBManager)
+ * [DIContainer](https://github.com/lavans/lacoder2/wiki/DIContainer)
+ * [RemoteProcedureCall](https://github.com/lavans/lacoder2/wiki/RemoteProcedureCall)
+ * [拡張子について](https://github.com/lavans/lacoder2/wiki/拡張子について)
+ * [jspテンプレート](https://github.com/lavans/lacoder2/wiki/jspテンプレート)
+ * [用語集](https://github.com/lavans/lacoder2/wiki/用語集)
+ * [TODO](https://github.com/lavans/lacoder2/wiki/TODO)
 
 ### 設定ファイルリファレンス 
  * [wiki:lacoder.xml]
