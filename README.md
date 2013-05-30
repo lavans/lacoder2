@@ -30,19 +30,19 @@ lacoder2
  * [TODO](https://github.com/lavans/lacoder2/wiki/TODO)
 
 ### 設定ファイルリファレンス 
- * [wiki:lacoder.xml]
- * [wiki:lacoder-generator.xml]
- * [wiki:entity.xml]
- * [wiki:dao.xml]
+ * [lacoder.xml](https://github.com/lavans/lacoder2/wiki/lacoder.xml)
+ * [lacoder-generator.xml](https://github.com/lavans/lacoder2/wiki/lacoder-generator.xml)
+ * [entity.xml](https://github.com/lavans/lacoder2/wiki/entity.xml)
+ * [dao.xml](https://github.com/lavans/lacoder2/wiki/dao.xml)
 ### tagfileリファレンス 
- * [wiki:checkbox.tag]
- * [wiki:errors.tag]
- * [wiki:pager.tag]
- * [wiki:paramstring.tag]
- * [wiki:radio.tag]
- * [wiki:select.tag]
- * [wiki:selectArray.tag]
- * [wiki:utils.tag]
+ * [checkbox.tag](https://github.com/lavans/lacoder2/wiki/checkbox.tag)
+ * [errors.tag](https://github.com/lavans/lacoder2/wiki/errors.tag)
+ * [pager.tag](https://github.com/lavans/lacoder2/wiki/pager.tag)
+ * [paramstring.tag](https://github.com/lavans/lacoder2/wiki/paramstring.tag)
+ * [radio.tag](https://github.com/lavans/lacoder2/wiki/radio.tag)
+ * [select.tag](https://github.com/lavans/lacoder2/wiki/select.tag)
+ * [selectArray.tag](https://github.com/lavans/lacoder2/wiki/selectArray.tag)
+ * [utils.tag](https://github.com/lavans/lacoder2/wiki/utils.tag)
 
 ## メンバー 
 <table>
