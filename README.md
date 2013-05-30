@@ -110,7 +110,3 @@ lacoder2
 </table>
 
 
-## SVNリポジトリ 
-svn://lakshmi/home/svn/lavans/trunk/luz2
-
-この Wiki ページの完全なリストは、 TitleIndex をご覧下さい。
