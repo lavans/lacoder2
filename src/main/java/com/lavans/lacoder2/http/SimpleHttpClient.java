@@ -75,7 +75,7 @@ public class SimpleHttpClient {
 	private Method method = Method.GET;
 	private int timeout;
 	private Map<String, String> requestProperties=null;
-	
+
 	protected SimpleHttpClient(){
 	}
 	protected void setParameters(String urlStr, String charset, String postData, Method method, int timeout, Map<String, String> requestProperties){
@@ -87,7 +87,7 @@ public class SimpleHttpClient {
 		this.timeout = timeout;
 		this.requestProperties = requestProperties;
 	}
-	
+
 	/**
 	 * Simple Get. Convenience method.
 	 * @param 接続先URL。
@@ -135,7 +135,7 @@ public class SimpleHttpClient {
 	/**
 	 * 接続処理。接続に失敗した場合はIOExceptionを返します。
 	 * URL異常などの製造バグはRuntimeExceptionを返します。
-	 * 
+	 *
 	 * @throws IOException IOException  if an I/O exception occurs.
 	 */
 	protected void connect() throws IOException{
@@ -172,7 +172,7 @@ public class SimpleHttpClient {
 		if(method==Method.POST){
 			con.setDoOutput(true);
 		}
-		
+
 		con.setConnectTimeout(timeout);
 		con.setReadTimeout(timeout);
 	}
@@ -187,6 +187,10 @@ public class SimpleHttpClient {
 		// debug
 		logger.debug(urlStr + (postData==null?"":" post["+ postData +"]"));
 
+		if(urlStr.contains("java.lang")){
+			logger.error(urlStr + " contains JDK class.");
+		}
+
 		// POSTの時
 		if(postData!=null){
 			doPost(con);
@@ -199,7 +203,7 @@ public class SimpleHttpClient {
 	/**
 	 * URLコネクションからInputStreamを取り出します。
 	 * gzipの場合はGZipInputStreamが返ります。
-	 * 
+	 *
 	 * @param con
 	 * @return
 	 * @throws IOException
@@ -296,28 +300,28 @@ public class SimpleHttpClient {
 
 	public static class Builder {
 		private static final String DEFAULT_CHARSET="UTF-8";
-		private static final int DEFAULT_TIMEOUT = 5000;
+		private static final int DEFAULT_TIMEOUT = 50000; // 5000
 		/**
 		 * Constructor.
-		 * 
+		 *
 		 * @param url string for connect.
 		 */
 		private Builder(String urlStr){
 			this.urlStr = urlStr;
 		}
-		
+
 		/**
 		 * Create new Builder instance with url.
-		 * 
+		 *
 		 * TODO staticをやめて単体テストのときにBuilderごと差し替え可能にする。
-		 * 
+		 *
 		 * @param url string for connect
 		 * @return Builder instance.
 		 */
 		public static Builder simpleHttpClient(String urlStr){
 			return new Builder(urlStr);
 		}
-		
+
 		/** url. required. */
 		private String urlStr=null;
 		private String charset=DEFAULT_CHARSET;
@@ -416,9 +420,9 @@ public class SimpleHttpClient {
 		/**
 		 * Build SimpleHttpClient instance.
 		 * Serverに接続して失敗した場合は例外を生成します。
-		 * 
+		 *
 		 * @return
-		 * @throws IOException if I/O 
+		 * @throws IOException if I/O
 		 */
 		public SimpleHttpClient build() throws IOException{
 			if(query!=null){
@@ -433,7 +437,7 @@ public class SimpleHttpClient {
 			return client;
 		}
 	}
-	
+
 	/**
 	 * https接続時にssl証明書の検証をオフにする。
 	 */

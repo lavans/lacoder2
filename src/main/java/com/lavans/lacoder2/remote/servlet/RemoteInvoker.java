@@ -8,15 +8,12 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-import net.arnx.jsonic.JSON;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
 import com.lavans.lacoder2.di.BeanManager;
 import com.lavans.lacoder2.di.ServiceManager;
-import com.lavans.lacoder2.lang.ClassUtils;
 import com.lavans.lacoder2.remote.servlet.converter.Converter;
 import com.lavans.lacoder2.remote.servlet.converter.RelativeConverter;
 
@@ -42,14 +39,14 @@ public class RemoteInvoker {
 	public String invoke(String url, Class<?>[] parameterTypes, Object[] args){
 		logger.debug(url + " paramTypes:"+  Arrays.toString(parameterTypes) +" args:"+ Arrays.toString(args));
 
-		// 実行
 		Object out=null;
+		ServiceInfo info = null;
 		try {
 			// Get method to execute
-			ServiceInfo info = ServiceInfo.getInstance(url, parameterTypes, args, converter);
+			info = ServiceInfo.getInstance(url, parameterTypes, args, converter);
 			out = info.method.invoke(info.service, info.args);
 		} catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-			throw new RuntimeException(e);
+			throw new RuntimeException(info.service.getClass().getSimpleName()+"#"+info.method.getName()+"("+info.args+")", e);
 		}
 		return ObjectSerializer.serialize(out);
 	}
@@ -127,11 +124,18 @@ public class RemoteInvoker {
 			info.service = ServiceManager.getServiceLocal(serviceName);
 
 			try {
+				checkParameter(serviceName, info);
 				info.method = info.service.getClass().getMethod(methodName, parameterTypes);
-			} catch (Exception e) {
-				logger.error("Failed to get method. Please check xml /di/bean secition.["+ serviceName +"] ");
-				logger.error("Or Check service class.["+ serviceName +"#"+ methodName + "]");
-				throw new RuntimeException(e);
+			} catch (NoSuchMethodException e) {
+				// 派生クラス型だと見つからない(!)ので、メソッド名のみをキーに探す
+				try{
+					info.method = findMethodByName(info.service.getClass(), methodName, args);
+				} catch (NoSuchMethodException e2) {
+					logger.error("Failed to get method. Please check xml /di/bean secition.["+ serviceName +"] ");
+					logger.error("Or Check service class.["+ serviceName +"#"+ methodName + "]");
+					// eの情報で例外を投げる
+					throw new RuntimeException(e);
+				}
 			}
 
 			info.args = args;
@@ -139,6 +143,56 @@ public class RemoteInvoker {
 			logger.debug(info.service.getClass().getName()+"#"+info.method.getName()+"()");
 			return info;
 		}
+
+		/**
+		 * debug用
+		 * @param serviceName
+		 * @param info
+		 */
+		private static void checkParameter(String serviceName, ServiceInfo info){
+			if(serviceName.endsWith("ScoreService")){
+				Method[] methods = info.service.getClass().getMethods();
+				for(Method method: methods){
+					String paramsStr="";
+					for(Class<?> clazz: method.getParameterTypes()){
+						paramsStr+=clazz.getSimpleName();
+					}
+					logger.debug(method.getName()+":"+paramsStr);
+				}
+			}
+		}
+
+		/**
+		 * メソッド名からメソッドを探します。
+		 * メソッドが見つからない場合はNoSuchMethodExceptionを投げます。
+		 *
+		 * @param clazz
+		 * @param methodName
+		 * @return
+		 * @throws NoSuchMethodException
+		 */
+		private static Method findMethodByName(Class<?> clazz, String methodName, Object[] args) throws NoSuchMethodException{
+			Method[] methods = clazz.getMethods();
+			for(Method method: methods){
+				if(method.getName().equals(methodName) &&
+					isSameParameterTypes(method.getParameterTypes(), args)){
+					return method;
+				}
+			}
+			throw new NoSuchMethodException(clazz.getName()+"#"+methodName+"()");
+		}
+
+		private static boolean isSameParameterTypes(Class<?> parameterTypes[], Object[] args){
+			boolean result = true;
+			for(int i=0; i<parameterTypes.length; i++){
+				if(args[i]!=null && !parameterTypes[i].isAssignableFrom(args[i].getClass())){
+					result=false;
+					break;
+				}
+			}
+			return result;
+		}
+
 		/**
 		 * Make service name from url.
 		 * "member.MemberService" -> "com.example.project.service.member.MemberService".

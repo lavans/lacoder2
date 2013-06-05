@@ -10,8 +10,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
 import com.lavans.lacoder2.di.annotation.Scope;
@@ -21,7 +21,7 @@ import com.lavans.lacoder2.lang.StringUtils;
 @Scope(Type.PROTOTYPE)
 public class CommandExecutor {
 	/** logger */
-	private static Log logger = LogFactory.getLog(CommandExecutor.class);
+	private static Logger logger = LoggerFactory.getLogger(CommandExecutor.class);
 
 	/** デフォルトのコマンドタイムアウト */
 //	private static final int TIMEOUT=3;

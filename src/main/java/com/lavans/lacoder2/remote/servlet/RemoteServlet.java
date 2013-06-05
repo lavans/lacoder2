@@ -3,11 +3,7 @@
  */
 package com.lavans.lacoder2.remote.servlet;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.concurrent.TimeUnit;
@@ -18,14 +14,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import lombok.Cleanup;
-import lombok.Data;
-
-
-import net.arnx.jsonic.JSON;
-import net.arnx.jsonic.util.Base64;
-
-import org.junit.ClassRule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -75,7 +63,7 @@ public class RemoteServlet extends HttpServlet {
 	}
 
 	private String adujstEncode(String str){
-		logger.debug(str);
+//		logger.debug(str);
 		try {
 			return new String(str.getBytes(ENCODING_ORG),ENCODING_JSON);
 //			return new String(URLDecoder.decode(str, ENCODING_ORG).getBytes(ENCODING_ORG),ENCODING_JSON);
@@ -121,6 +109,6 @@ public class RemoteServlet extends HttpServlet {
 
 		// log
 		stopwatch.stop();
-		logger.info(pathInfo+" "+ stopwatch.elapsed(TimeUnit.MILLISECONDS)+"ms "+argsStr);
+		logger.info(pathInfo+" "+ stopwatch.elapsed(TimeUnit.MILLISECONDS)+"ms"); // "+argsStr);
 	}
 }

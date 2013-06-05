@@ -23,8 +23,9 @@ public class ServiceManager { // implements ServiceManager{
 	/** logger */
 	private static final Logger logger = LogUtils.getLogger();
 
-	/** cache of all service */
+	/** Cache of all service */
 	private static Map<String, Object> serviceMap = new ConcurrentHashMap<String, Object>();
+	private static Map<String, Object> serviceLocalMap = new ConcurrentHashMap<String, Object>();
 
 	/**
 	 * Get Service from id with group
@@ -70,6 +71,7 @@ public class ServiceManager { // implements ServiceManager{
 //		Class<? extends Object> clazz = BeanManager.getBeanClass(id);
 		service = createService(clazz, new RemoteInterceptor(serverGroup));
 		serviceMap.put(id, service);
+		logger.debug("Add Service "+ id);
 		return (T)service;
 	}
 
@@ -93,7 +95,7 @@ public class ServiceManager { // implements ServiceManager{
 	@SuppressWarnings("unchecked")
 	public static <T> T getServiceLocal(String id) {
 		// search from cache
-		Object service = serviceMap.get(id);
+		Object service = serviceLocalMap.get(id);
 		// If service is found, return cache.
 		if(service!=null){
 			return (T)service;
@@ -102,7 +104,10 @@ public class ServiceManager { // implements ServiceManager{
 		Class<? extends Object> clazz = BeanManager.getBeanClass(id);
 
 		service = createService(clazz, new TransactionInterceptor());
-		serviceMap.put(id, service);
+		serviceLocalMap.put(id, service);
+		if(id.startsWith("Admin")){
+			logger.debug("Add ServiceLocal "+ id);
+		}
 		return (T)service;
 	}
 
