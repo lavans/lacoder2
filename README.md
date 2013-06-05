@@ -18,7 +18,7 @@ lacoder2
  * [ポリシー](https://github.com/lavans/lacoder2/wiki/ポリシー)
  * [アーキテクチャ概要](https://github.com/lavans/lacoder2/wiki/アーキテクチャ概要)
  * [動かしてみよう](https://github.com/lavans/lacoder2/wiki/動かしてみよう)
- * [wiki:アーキテクチャ詳細](optional)
+ * [アーキテクチャ詳細](https://github.com/lavans/lacoder2/wiki/アーキテクチャ詳細)
  * [フォルダ構成](https://github.com/lavans/lacoder2/wiki/フォルダ構成)
  * [XMLReader](https://github.com/lavans/lacoder2/wiki/XMLReader)
  * [DBManager](https://github.com/lavans/lacoder2/wiki/DBManager)
@@ -34,6 +34,7 @@ lacoder2
  * [lacoder-generator.xml](https://github.com/lavans/lacoder2/wiki/lacoder-generator.xml)
  * [entity.xml](https://github.com/lavans/lacoder2/wiki/entity.xml)
  * [dao.xml](https://github.com/lavans/lacoder2/wiki/dao.xml)
+
 ### tagfileリファレンス 
  * [checkbox.tag](https://github.com/lavans/lacoder2/wiki/checkbox.tag)
  * [errors.tag](https://github.com/lavans/lacoder2/wiki/errors.tag)
