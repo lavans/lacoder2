@@ -18,7 +18,7 @@ lacoder2
  * [ポリシー](https://github.com/lavans/lacoder2/wiki/ポリシー)
  * [アーキテクチャ概要](https://github.com/lavans/lacoder2/wiki/アーキテクチャ概要)
  * [動かしてみよう](https://github.com/lavans/lacoder2/wiki/動かしてみよう)
- * [wiki:アーキテクチャ詳細](optional)
+ * [アーキテクチャ詳細](optional)
  * [フォルダ構成](https://github.com/lavans/lacoder2/wiki/フォルダ構成)
  * [XMLReader](https://github.com/lavans/lacoder2/wiki/XMLReader)
  * [DBManager](https://github.com/lavans/lacoder2/wiki/DBManager)
