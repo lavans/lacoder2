@@ -62,10 +62,10 @@ public class GroupConnector implements Connector{
 				Object result = ObjectSerializer.deserialize(response.getContents());
 				// 結果を格納
 				resultMap.put(info.serverNode.getName(), result);
-				logger.info("remote execute["+ methodStr+"] return [" + result +"]");
+				logger.debug("remote execute["+ methodStr+"] return [" + result +"]");
 			} catch (Exception e) {
 				resultMap.put(info.serverNode.getName(), ERROR);
-				logger.info( "remote execute failed.["+ methodStr +"]", e);
+				logger.debug( "remote execute failed.["+ methodStr +"]", e);
 			}
 		}
 		return resultMap;

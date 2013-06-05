@@ -56,10 +56,10 @@ public class SingleConnector implements Connector{
 			HttpResponse response = info.client.request();
 			Object result = ObjectSerializer.deserialize(response.getContents());
 			// ログへ出力
-			logger.info("Remote execute["+ methodStr +"] return [" + result +"]");
+			logger.debug("remote execute["+ methodStr +"] return [" + result +"]");
 			return result;
 		}catch (IOException e) {
-			logger.info("Remote execute["+ methodStr +"] error"+ e.getMessage());
+			logger.debug("remote execute["+ methodStr +"] error"+ e.getMessage());
 			throw new RuntimeException(e);
 		}
 	}
