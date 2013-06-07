@@ -71,7 +71,7 @@ public class ServiceManager { // implements ServiceManager{
 //		Class<? extends Object> clazz = BeanManager.getBeanClass(id);
 		service = createService(clazz, new RemoteInterceptor(serverGroup));
 		serviceMap.put(id, service);
-		logger.debug("Add Service "+ id);
+//		logger.debug("Add Service "+ id);
 		return (T)service;
 	}
 

@@ -8,6 +8,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.beanutils.MethodUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -44,9 +45,9 @@ public class RemoteInvoker {
 		try {
 			// Get method to execute
 			info = ServiceInfo.getInstance(url, parameterTypes, args, converter);
-			out = info.method.invoke(info.service, info.args);
+			out = MethodUtils.invokeMethod(info.service, info.methodName, args);
 		} catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-			throw new RuntimeException(info.service.getClass().getSimpleName()+"#"+info.method.getName()+"("+info.args+")", e);
+			throw new RuntimeException(info.service.getClass().getSimpleName()+"#"+info.methodName+"("+args+")", e);
 		}
 		return ObjectSerializer.serialize(out);
 	}
@@ -71,7 +72,6 @@ public class RemoteInvoker {
 	public Map<String, String> makePostData(Object[] args){
 		// 引数は一つDtoInのみ
 		Map<String, String> postData = new HashMap<String, String>();
-//		postData.put("parameterTypes", JSON.encode(ClassUtils.toClass(args)));
 		postData.put("args", ObjectSerializer.serialize(args));
 		postData.put(RemoteInvoker.UID, MDC.get(UID));
 		return postData;
@@ -104,8 +104,7 @@ public class RemoteInvoker {
 	 */
 	public static class ServiceInfo{
 		Object service;
-		Method method;
-		Object[] args;
+		String methodName;
 
 		/**
 		 * URLから実行メソッド情報の取得
@@ -117,80 +116,13 @@ public class RemoteInvoker {
 		static ServiceInfo getInstance(String url, Class<?>[] parameterTypes, Object[] args, Converter converter) throws NoSuchMethodException, SecurityException{
 			String urls[] = url.split(METHOD_SPLITTER);
 			String serviceName = toServiceName(urls[0], converter);
-			String methodName = urls[1];
-			logger.debug(serviceName+"#"+methodName+"()");
 
 			ServiceInfo info = new ServiceInfo();
 			info.service = ServiceManager.getServiceLocal(serviceName);
+			info.methodName = urls[1];
+			logger.debug(serviceName+"#"+info.methodName+"()");
 
-			try {
-				checkParameter(serviceName, info);
-				info.method = info.service.getClass().getMethod(methodName, parameterTypes);
-			} catch (NoSuchMethodException e) {
-				// 派生クラス型だと見つからない(!)ので、メソッド名のみをキーに探す
-				try{
-					info.method = findMethodByName(info.service.getClass(), methodName, args);
-				} catch (NoSuchMethodException e2) {
-					logger.error("Failed to get method. Please check xml /di/bean secition.["+ serviceName +"] ");
-					logger.error("Or Check service class.["+ serviceName +"#"+ methodName + "]");
-					// eの情報で例外を投げる
-					throw new RuntimeException(e);
-				}
-			}
-
-			info.args = args;
-
-			logger.debug(info.service.getClass().getName()+"#"+info.method.getName()+"()");
 			return info;
-		}
-
-		/**
-		 * debug用
-		 * @param serviceName
-		 * @param info
-		 */
-		private static void checkParameter(String serviceName, ServiceInfo info){
-			if(serviceName.endsWith("ScoreService")){
-				Method[] methods = info.service.getClass().getMethods();
-				for(Method method: methods){
-					String paramsStr="";
-					for(Class<?> clazz: method.getParameterTypes()){
-						paramsStr+=clazz.getSimpleName();
-					}
-					logger.debug(method.getName()+":"+paramsStr);
-				}
-			}
-		}
-
-		/**
-		 * メソッド名からメソッドを探します。
-		 * メソッドが見つからない場合はNoSuchMethodExceptionを投げます。
-		 *
-		 * @param clazz
-		 * @param methodName
-		 * @return
-		 * @throws NoSuchMethodException
-		 */
-		private static Method findMethodByName(Class<?> clazz, String methodName, Object[] args) throws NoSuchMethodException{
-			Method[] methods = clazz.getMethods();
-			for(Method method: methods){
-				if(method.getName().equals(methodName) &&
-					isSameParameterTypes(method.getParameterTypes(), args)){
-					return method;
-				}
-			}
-			throw new NoSuchMethodException(clazz.getName()+"#"+methodName+"()");
-		}
-
-		private static boolean isSameParameterTypes(Class<?> parameterTypes[], Object[] args){
-			boolean result = true;
-			for(int i=0; i<parameterTypes.length; i++){
-				if(args[i]!=null && !parameterTypes[i].isAssignableFrom(args[i].getClass())){
-					result=false;
-					break;
-				}
-			}
-			return result;
 		}
 
 		/**
