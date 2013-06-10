@@ -24,7 +24,7 @@ public class ParameterUtils {
 	private static Logger logger = LogUtils.getLogger();
 	/**
 	 * Map<String, String>からIParameterizable#setParameters()に適した
-	 * Map<String, String[]>形式に変換。いらないかも
+	 * Map<String, String[]>形式に変換。
 	 *
 	 * @return
 	 */
