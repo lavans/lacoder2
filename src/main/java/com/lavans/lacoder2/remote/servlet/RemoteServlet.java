@@ -100,12 +100,12 @@ public class RemoteServlet extends HttpServlet {
 //			args[i] = JSON.decode("["+argsStrs[i]+"]", parameterTypes[i]);
 //		}
 //		Object args = JSON.decode(argsStr, parameterTypes);
-		String data = invoker.invoke(pathInfo, ClassUtils.toClass(args), args);
+		byte data[] = invoker.invoke(pathInfo, ClassUtils.toClass(args), args);
 
 
 		// Write response
 		WriteUtils writeUtils = BeanManager.getBean(WriteUtils.class);
-		writeUtils.writeJson(response, data);
+		writeUtils.writeBytes(response, data);
 
 		// log
 		stopwatch.stop();

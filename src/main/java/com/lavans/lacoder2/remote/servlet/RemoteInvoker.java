@@ -37,7 +37,7 @@ public class RemoteInvoker {
 	 * @param request
 	 * @return
 	 */
-	public String invoke(String url, Class<?>[] parameterTypes, Object[] args){
+	public byte[] invoke(String url, Class<?>[] parameterTypes, Object[] args){
 		logger.debug(url + " paramTypes:"+  Arrays.toString(parameterTypes) +" args:"+ Arrays.toString(args));
 
 		Object out=null;
@@ -72,7 +72,7 @@ public class RemoteInvoker {
 	public Map<String, String> makePostData(Object[] args){
 		// 引数は一つDtoInのみ
 		Map<String, String> postData = new HashMap<String, String>();
-		postData.put("args", ObjectSerializer.serialize(args));
+		postData.put("args", ObjectSerializer.serializeString(args));
 		postData.put(RemoteInvoker.UID, MDC.get(UID));
 		return postData;
 	}

@@ -185,7 +185,7 @@ public class SimpleHttpClient {
 	 */
 	public HttpResponse request() throws IOException {
 		// debug
-		logger.debug(urlStr + (postData==null?"":" post["+ postData +"]"));
+		logger.debug(urlStr); // + (postData==null?"":" post["+ postData +"]"));
 
 		if(urlStr.contains("java.lang")){
 			logger.error(urlStr + " contains JDK class.");

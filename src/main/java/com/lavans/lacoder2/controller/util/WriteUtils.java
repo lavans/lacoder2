@@ -95,7 +95,7 @@ public class WriteUtils {
 			}
 		}
 	}
-	
+
 	/**
 	 * Write Json data to response with "application/json" and "UTF-8".
 	 * @param response
@@ -120,5 +120,24 @@ public class WriteUtils {
 		writer.flush();
 		writer.close();
 	}
+
+	/**
+	 * Write Json data to response with "application/json" and "UTF-8".
+	 * @param response
+	 * @param data
+	 */
+	public void writeBytes(HttpServletResponse response, byte data[]){
+		// application/json or  text/javascript
+		response.setContentType("application/octet-stream");
+		response.setCharacterEncoding("UTF-8");
+
+		try(OutputStream out = response.getOutputStream()) {
+			out.write(data);
+			out.flush();
+		} catch (IOException e) {
+			new RuntimeException(e);
+		}
+	}
+
 
 }

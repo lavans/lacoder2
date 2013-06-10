@@ -54,7 +54,7 @@ public class SingleConnector implements Connector{
 		String methodStr = info.serverNode.getUri() + method.getDeclaringClass().getSimpleName()+"#"+method.getName();
 		try{
 			HttpResponse response = info.client.request();
-			Object result = ObjectSerializer.deserialize(response.getContents());
+			Object result = ObjectSerializer.deserialize(response.getContentsAsBinary());
 			// ログへ出力
 			logger.debug("remote execute["+ methodStr +"] return [" + result +"]");
 			return result;
