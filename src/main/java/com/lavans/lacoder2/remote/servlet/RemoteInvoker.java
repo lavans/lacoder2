@@ -1,6 +1,5 @@
 package com.lavans.lacoder2.remote.servlet;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -46,8 +45,8 @@ public class RemoteInvoker {
 			// Get method to execute
 			info = ServiceInfo.getInstance(url, parameterTypes, args, converter);
 			out = MethodUtils.invokeMethod(info.service, info.methodName, args);
-		} catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-			throw new RuntimeException(info.service.getClass().getSimpleName()+"#"+info.methodName+"("+args+")", e);
+		} catch (Exception e) {
+			throw new RuntimeException(info.service.getClass().getSimpleName()+"#"+info.methodName+"("+Arrays.toString(args)+")", e);
 		}
 		return ObjectSerializer.serialize(out);
 	}
