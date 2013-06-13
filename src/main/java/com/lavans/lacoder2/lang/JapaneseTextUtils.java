@@ -4,7 +4,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class JapaneseTextUtil {
+public class JapaneseTextUtils {
 	/**
 	 * strのエンコードを「Windows-31J」に変換し、そのバイト数を返す
 	 *
