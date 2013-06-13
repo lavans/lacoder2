@@ -47,12 +47,20 @@ public class Validator {
 			logger.info("携帯メールドメイン指定無し");
 		}
 	}
+
+	public static boolean isValidMail(String item){
+		return isValid("mail", item);
+	}
+
 	/**
 	 * メールアドレス、ドメイン部がモバイルかチェック
 	 * @param item
 	 * @return
 	 */
 	public static boolean isValidMailMobile(String item){
+		if(isValidMail(item)){
+			return false;
+		}
 		for(String domain: domainList){
 			if(item.contains(domain)){
 				return true;
@@ -61,7 +69,6 @@ public class Validator {
 		return false;
 	}
 
-//		if(item.matches("[\\w-._? +]+@[\\w-._]+.[\\w.-_]+")){
 			//		if(item.matches("[\\d]{2,5}-[\\d]{1,4}-[\\d]{4}")){
 //		if(item.matches("[\\d]{3}-[\\d]{4}")){
 }

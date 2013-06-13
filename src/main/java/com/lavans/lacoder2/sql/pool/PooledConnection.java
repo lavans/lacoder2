@@ -36,7 +36,7 @@ import com.lavans.lacoder2.sql.bind.BindPreparedStatement;
 
 
 /**
- * DBManager.releaseConnection(con)を呼ばなくても、con.close()すると
+ * con.close()を呼ばなくても、con.close()すると
  * コネクションを返却するように振る舞うためのラッパークラス。
  *
  * 各種Statementを作成するときは、PooledStatementでラップする。

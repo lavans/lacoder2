@@ -3,18 +3,20 @@
  */
 package com.lavans.lacoder2.lang;
 
-
-
 /**
- * commonsのStringUtils拡張クラス
- * TODO commonsと似たようなメソッドの整理
+ * commonsのStringUtils拡張クラス TODO commonsと似たようなメソッドの整理
  *
  * @see http://commons.apache.org/lang/api-release/index.html
  * @author dobashi
  */
-public class StringUtils extends org.apache.commons.lang3.StringUtils{
+public class StringUtils extends org.apache.commons.lang3.StringUtils {
 	/** logger */
-	// private static Logger logger = LoggerFactory.getLogger(StringUtil.class.getName());
+	// private static Logger logger =
+	// LoggerFactory.getLogger(StringUtils.class.getName());
+
+	public static String toCommaString(String[] array) {
+		return join(array, ",");
+	}
 
 	/**
 	 * 意味区切りアンダーバーを大文字に変換。 customer_id -> customerId.
@@ -24,7 +26,8 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils{
 	 */
 	public static String toCamelCase(String str) {
 		// check empty
-		if(isEmpty(str)) return str;
+		if (isEmpty(str))
+			return str;
 
 		// all letters shoud be lowered
 		str = str.toLowerCase();
@@ -38,9 +41,10 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils{
 		}
 		return buf.toString();
 	}
-	
+
 	/**
 	 * UpperCamel
+	 *
 	 * @param str
 	 * @return
 	 */
@@ -48,28 +52,32 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils{
 		return capitalize(toCamelCase(str));
 	}
 
+	public static String toUnderscore(String str) {
+		return toSnakeCase(str);
+	}
 
 	/**
-	 * 意味区切り大文字をアンダーバーに変換。 customerId -> customer_id
-	 * 一文字目が大文字の場合は小文字にするだけ。
+	 * 意味区切り大文字をアンダーバーに変換。 customerId -> customer_id 一文字目が大文字の場合は小文字にするだけ。
+	 *
 	 * @param str
 	 * @return
 	 */
-	public static String toUnderscore(String str) {
+	public static String toSnakeCase(String str) {
 		// check empty
-		if(isEmpty(str)) return str;
+		if (isEmpty(str))
+			return str;
 
 		// toLower first letter.
-		if(Character.isUpperCase(str.charAt(0))){
+		if (Character.isUpperCase(str.charAt(0))) {
 			str = uncapitalize(str);
 		}
 
 		// change upper case to underscore
 		StringBuffer buf = new StringBuffer(str.length());
-		for(char ch: str.toCharArray()){
-			if(Character.isUpperCase(ch)){
+		for (char ch : str.toCharArray()) {
+			if (Character.isUpperCase(ch)) {
 				buf.append("_").append(Character.toLowerCase(ch));
-			}else{
+			} else {
 				buf.append(ch);
 			}
 		}
@@ -83,10 +91,10 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils{
 	 * @param indent
 	 * @return
 	 */
-	public static String indent(String str, int indent){
+	public static String indent(String str, int indent) {
 		StringBuffer buf = new StringBuffer(str.length());
 		String[] lines = str.split("\n");
-		for(String line: lines){
+		for (String line : lines) {
 			buf.append(repeat("\t", indent)).append(line).append("\n");
 		}
 
@@ -104,28 +112,28 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils{
 	public static String joinQuote(String strs[], String delim, String quote) {
 		StringBuffer buf = new StringBuffer();
 		for (int i = 0; i < strs.length; i++) {
-			if(org.apache.commons.lang3.StringUtils.isEmpty(strs[i])){
+			if (org.apache.commons.lang3.StringUtils.isEmpty(strs[i])) {
 				continue;
 			}
 			buf.append(delim + quote + strs[i] + quote);
 		}
 		// 1件も無ければ空文字列
-		if(buf.length()==0){
+		if (buf.length() == 0) {
 			return "";
 		}
 		return buf.substring(delim.length());
 	}
 
-
 	/**
 	 * splitした各itemをtrim()して返す。
 	 *
 	 * @param str
-	 * @param delim 区切り文字(正規表現可)
+	 * @param delim
+	 *            区切り文字(正規表現可)
 	 * @return
 	 */
 	public static String[] splitTrim(String str, String delim) {
-		if(str==null){
+		if (str == null) {
 			return new String[0];
 		}
 		String strs[] = str.split(delim);
@@ -137,12 +145,13 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils{
 
 	/**
 	 * Object[]をString[]に変換。
+	 *
 	 * @param src
 	 * @return
 	 */
 	public static String[] toStringArray(Object[] src) {
 		String[] dst = new String[src.length];
-		for(int i=0; i<src.length; i++){
+		for (int i = 0; i < src.length; i++) {
 			dst[i] = src[i].toString();
 		}
 		return dst;
@@ -152,7 +161,8 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils{
 	 * バイト配列を16進数の文字列にする。
 	 *
 	 * @param b
-	 * @param delim 区切り文字":"など
+	 * @param delim
+	 *            区切り文字":"など
 	 * @return
 	 */
 	public static String toHex(byte[] b, String delim) {
@@ -179,14 +189,11 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils{
 		int tokenLength = 2 + delim.length();
 		byte[] b = new byte[(str.length() + delim.length()) / tokenLength];
 		for (int i = 0; i < b.length; i++) {
-			b[i] = (byte) Integer.parseInt(str.substring(i * tokenLength, i * tokenLength + 2), 16);
+			b[i] = (byte) Integer.parseInt(
+					str.substring(i * tokenLength, i * tokenLength + 2), 16);
 		}
 
 		return b;
 	}
 
-//	public static String join(String[] value, String string) {
-//		// TODO Auto-generated method stub
-//		return null;
-//	}
 }

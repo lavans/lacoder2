@@ -238,7 +238,7 @@ public class Pager<E> implements Serializable{
 	 */
 	public void setLinkParam(String linkParam) {
 		this.linkParam = linkParam;
-//		this.linkParam = StringUtil.encodeParameterValues(linkParam);
+//		this.linkParam = StringUtils.encodeParameterValues(linkParam);
 	}
 	/**
 	 * @return linkUrl を戻します。

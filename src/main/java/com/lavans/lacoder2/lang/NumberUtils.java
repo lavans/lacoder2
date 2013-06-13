@@ -3,6 +3,7 @@ package com.lavans.lacoder2.lang;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.Locale;
 
 public class NumberUtils extends org.apache.commons.lang3.math.NumberUtils{
@@ -148,4 +149,47 @@ public class NumberUtils extends org.apache.commons.lang3.math.NumberUtils{
 
 		return true;
 	}
+
+	/**
+	 * 文字列配列をIntegerの配列に変換。
+	 * 文字列が"n-m"の形式の時はnからmの間の数値も生成する。
+	 *
+	 * @param src
+	 * @return
+	 */
+	public static Integer[] toIntegerArray(String[] strs) {
+		ArrayList<Integer> list = new ArrayList<>();
+		for (String str: strs) {
+			Integer[] values = parseRange(str);
+			for(int value: values){
+				list.add(value);
+			}
+		}
+		return (Integer[])list.toArray();
+	}
+
+	/**
+	 * 配列の中に"-"が含まれている要素があれば前後の数字を元にその範囲内も含めて配列にする
+	 *
+	 * @param strs
+	 * @return
+	 */
+	public static Integer[] parseRange(String str) {
+		// "-"が含まれているか
+		if(!str.contains("-")){
+			return new Integer[]{Integer.valueOf(str)};
+		}
+
+		// 含まれていればハイフンで分割を行い、範囲内の数値をListに追加していく
+		String range[] = StringUtils.splitTrim(str, "-");
+		int start = Integer.valueOf(range[0]);
+		int end = Integer.valueOf(range[1]);
+
+		Integer[] result = new Integer[end-start];
+		for(int i=0; i<=result.length; i++){
+			result[i] = i+start;
+		}
+		return result;
+	}
+
 }
