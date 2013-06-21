@@ -1,6 +1,4 @@
-lacoder2
-========
-# lacoderとは <br>
+## lacoder2とは <br>
 「lavans coder」の略です。Java開発を楽にするための共通クラス群＋コードジェネレーターです。
 主な機能は下記です。
  * xmlファイルの読み込み(utils.Config)
@@ -14,7 +12,7 @@ lacoder2
  * 2011/04/28 luz2->lacoder名称統合
  * 2011/02/08 Wiki着手
 
-## ドキュメント 
+## ドキュメント
  * [ポリシー](https://github.com/lavans/lacoder2/wiki/ポリシー)
  * [アーキテクチャ概要](https://github.com/lavans/lacoder2/wiki/アーキテクチャ概要)
  * [動かしてみよう](https://github.com/lavans/lacoder2/wiki/動かしてみよう)
@@ -29,13 +27,13 @@ lacoder2
  * [用語集](https://github.com/lavans/lacoder2/wiki/用語集)
  * [TODO](https://github.com/lavans/lacoder2/wiki/TODO)
 
-### 設定ファイルリファレンス 
+### 設定ファイルリファレンス
  * [lacoder.xml](https://github.com/lavans/lacoder2/wiki/lacoder.xml)
  * [lacoder-generator.xml](https://github.com/lavans/lacoder2/wiki/lacoder-generator.xml)
  * [entity.xml](https://github.com/lavans/lacoder2/wiki/entity.xml)
  * [dao.xml](https://github.com/lavans/lacoder2/wiki/dao.xml)
 
-### tagfileリファレンス 
+### tagfileリファレンス
  * [checkbox.tag](https://github.com/lavans/lacoder2/wiki/checkbox.tag)
  * [errors.tag](https://github.com/lavans/lacoder2/wiki/errors.tag)
  * [pager.tag](https://github.com/lavans/lacoder2/wiki/pager.tag)
@@ -45,7 +43,7 @@ lacoder2
  * [selectArray.tag](https://github.com/lavans/lacoder2/wiki/selectArray.tag)
  * [utils.tag](https://github.com/lavans/lacoder2/wiki/utils.tag)
 
-## メンバー 
+## メンバー
 <table>
 <tr>
 <th>名前</th>
@@ -58,7 +56,7 @@ lacoder2
 </table>
 
 
-## 略歴 
+## 略歴
 <table>
 <tr>
 <td>2000年</td>
@@ -109,5 +107,6 @@ lacoder2
 <td>SoberのController,lremoteをluz2に統合。</td>
 </tr>
 </table>
+
 
 
