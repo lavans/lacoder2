@@ -7,10 +7,10 @@ package com.lavans.lacoder2.sql.dao;
 import java.util.List;
 import java.sql.SQLException;
 
-import lombok.val;
-
 import org.slf4j.Logger;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.LoadingCache;
 import com.lavans.lacoder2.di.BeanManager;
 import com.lavans.lacoder2.lang.LogUtils;
 import com.lavans.lacoder2.sql.dao.BaseDao;
@@ -20,11 +20,13 @@ import com.lavans.lacoder2.util.Pager;
 
 
 /**
- * EntityManager for 銘柄マスタ.
+ * EntityManager Cache版
+ * とちゅう
+ * 
  * @author dobashi
  *
  */
-public abstract class EntityManagerBase<E,PK> {
+public abstract class EntityManagerCacheBase<E,PK> {
 	/** logger */
 	private static Logger logger = LogUtils.getLogger();
 
@@ -35,7 +37,8 @@ public abstract class EntityManagerBase<E,PK> {
 	
 	protected abstract Class<E> getEntityClass();
 	
-	public EntityManagerBase(){
+	
+	public EntityManagerCacheBase(){
 		clazz = getEntityClass();
 		logger.debug(clazz.getSimpleName()+"Manager");
 	}
