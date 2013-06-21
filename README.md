@@ -1,6 +1,4 @@
-lacoder2
-========
-# lacoderとは <br>
+## lacoder2とは <br>
 「lavans coder」の略です。Java開発を楽にするための共通クラス群＋コードジェネレーターです。
 主な機能は下記です。
  * xmlファイルの読み込み(utils.Config)
