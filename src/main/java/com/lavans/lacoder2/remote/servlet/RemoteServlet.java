@@ -57,7 +57,7 @@ public class RemoteServlet extends HttpServlet {
 			doPost(request, response);
 		}else{
 			OutputStream os = response.getOutputStream();
-			os.write("{\"message\": \"iris remote\"}".getBytes());
+			os.write("{\"message\": \"lacoder2 remote\"}".getBytes());
 			os.flush();
 		}
 	}
