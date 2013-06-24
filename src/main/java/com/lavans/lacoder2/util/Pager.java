@@ -66,7 +66,7 @@ public class Pager<E> implements Serializable{
 	 */
 	public Pager(PageInfo pageInfo) {
 		this.pageInfo = pageInfo;
-		dataList = new ArrayList<E>(pageInfo.getRows());
+		dataList = new ArrayList<E>();
 		checkedIdList = new HashSet<String>();
 	}
 
