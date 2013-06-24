@@ -144,7 +144,7 @@ public class Config {
 //			root = (Element)xpath.evaluate("/luz", new InputSource(fis), XPathConstants.NODE);
 
 			// debugの取得
-			isDebug = Boolean.parseBoolean(getNodeValue("/root/debug"));
+			isDebug = Boolean.parseBoolean(getNodeValue("debug"));
 		} catch (SAXException | IOException | ParserConfigurationException e) {
 			// どこでRuntimeに入れるか検討
 			logger.error("Can't parse xml file.["+ fileName +"]", e);
