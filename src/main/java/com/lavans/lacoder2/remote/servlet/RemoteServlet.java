@@ -63,10 +63,9 @@ public class RemoteServlet extends HttpServlet {
 	}
 
 	private String adujstEncode(String str){
-//		logger.debug(str);
+		if(str==null) return null;
 		try {
 			return new String(str.getBytes(ENCODING_ORG),ENCODING_JSON);
-//			return new String(URLDecoder.decode(str, ENCODING_ORG).getBytes(ENCODING_ORG),ENCODING_JSON);
 		} catch (UnsupportedEncodingException e) {
 			throw new RuntimeException(e);
 		}
@@ -100,12 +99,16 @@ public class RemoteServlet extends HttpServlet {
 //			args[i] = JSON.decode("["+argsStrs[i]+"]", parameterTypes[i]);
 //		}
 //		Object args = JSON.decode(argsStr, parameterTypes);
-		byte data[] = invoker.invoke(pathInfo, ClassUtils.toClass(args), args);
+		try{
+			byte data[] = invoker.invoke(pathInfo, ClassUtils.toClass(args), args);
+			// Write response
+			WriteUtils writeUtils = BeanManager.getBean(WriteUtils.class);
+			writeUtils.writeBytes(response, data);
+		}catch(Throwable e){
+			logger.error(pathInfo, e);
+		}
 
 
-		// Write response
-		WriteUtils writeUtils = BeanManager.getBean(WriteUtils.class);
-		writeUtils.writeBytes(response, data);
 
 		// log
 		stopwatch.stop();

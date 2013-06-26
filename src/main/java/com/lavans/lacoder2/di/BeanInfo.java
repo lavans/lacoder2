@@ -22,9 +22,18 @@ public class BeanInfo {
 
 	private Class<? extends Object> clazz = null;
 
+
+	public BeanInfo(){
+	}
+
+	public BeanInfo(String id, String className){
+		this.id=id;
+		this.className=className;
+	}
+
 	/**
 	 * Classクラスを返す。一度読み込んだらキャッシュして再利用。
-	 * 
+	 *
 	 * @return
 	 */
 	public Class<? extends Object> getClazz() {
@@ -50,11 +59,11 @@ public class BeanInfo {
 
 	/**
 	 * instanceを返す。一度読み込んだらキャッシュして再利用。
-	 * 
+	 *
 	 * Scope=request/sessionを実装するとActionServletとの関係が蜜になるので今はまだ実装しない。
 	 * ActionServletにstatic methodを用意してThreadLocalで実装できそう(未検証)。
 	 * sessionに入れるとセッションレプリケーションのパフォーマンスが落ちるので 実装はしばらく様子見
-	 * 
+	 *
 	 * @return
 	 */
 	public Object getInstance() {
@@ -79,7 +88,7 @@ public class BeanInfo {
 
 	/**
 	 * make new instace
-	 * 
+	 *
 	 * @return instance
 	 */
 	private Object newInstance() {
@@ -118,6 +127,6 @@ public class BeanInfo {
 				+ ", initMethod=" + initMethod + ", clazz=" + clazz
 				+ ", instance=" + singletonInstance + "]";
 	}
-	
-	
+
+
 }

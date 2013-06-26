@@ -16,9 +16,9 @@ import com.lavans.lacoder2.util.Config;
 
 /**
  * Service Manager Implementation for XML file(default).
- * 
+ *
  * @author dobashi
- * 
+ *
  */
 public class BeanManager {
 	/** logger */
@@ -46,7 +46,7 @@ public class BeanManager {
 
 	/**
 	 * Init bean & group info.
-	 * 
+	 *
 	 * @throws FileNotFoundException
 	 */
 	public static void init() {
@@ -57,7 +57,7 @@ public class BeanManager {
 
 	/**
 	 * Load configuration file.
-	 * 
+	 *
 	 * @param filename
 	 * @throws FileNotFoundException
 	 */
@@ -71,7 +71,7 @@ public class BeanManager {
 		// bean map
 		loadBeans(config);
 	}
-	
+
 	/**
 	 * read package config
 	 * @param config
@@ -116,7 +116,7 @@ public class BeanManager {
 
 	/**
 	 * get bean class. パッケージ指定有り
-	 * 
+	 *
 	 * @param name
 	 * @param id
 	 * @return
@@ -127,7 +127,7 @@ public class BeanManager {
 
 	/**
 	 * beanのreflectionクラスを返す。
-	 * 
+	 *
 	 * @param id
 	 * @return
 	 */
@@ -137,7 +137,7 @@ public class BeanManager {
 
 	/**
 	 * beanのreflectionクラスを返す。
-	 * 
+	 *
 	 * @param id
 	 * @return
 	 */
@@ -151,7 +151,7 @@ public class BeanManager {
 
 	/**
 	 * get bean instance. パッケージ指定有り
-	 * 
+	 *
 	 * @param name
 	 * @param id
 	 * @return
@@ -163,7 +163,7 @@ public class BeanManager {
 
 	/**
 	 * beanのsingletonインスタンスを返す
-	 * 
+	 *
 	 * @param id
 	 * @return
 	 */
@@ -178,7 +178,7 @@ public class BeanManager {
 
 	/**
 	 * beanのsingletonインスタンスを返す
-	 * 
+	 *
 	 * @param id
 	 * @return
 	 */
@@ -192,7 +192,7 @@ public class BeanManager {
 
 	/**
 	 * Make full class name.
-	 * 
+	 *
 	 * @param group
 	 * @param id
 	 * @return
@@ -219,7 +219,7 @@ public class BeanManager {
 
 	/**
 	 * Replace singleton instance.
-	 * 
+	 *
 	 * @param idClass
 	 * @param instance
 	 */
@@ -227,6 +227,21 @@ public class BeanManager {
 		BeanInfo bean = new BeanInfo();
 		bean.id = idClass.getName();
 		bean.singletonInstance = instance;
+		beanMap.put(bean.id, bean);
+	}
+
+	/**
+	 * Set bean definition.
+	 *
+	 * @param idClass
+	 * @param instance
+	 */
+	public static void setBean(String id, String className){
+		BeanInfo bean = new BeanInfo(id, className);
+		beanMap.put(id, bean);
+	}
+	public static void setBean(Class<?> idClass, Class<?> beanClass){
+		BeanInfo bean = new BeanInfo(idClass.getName(), beanClass.getName());
 		beanMap.put(bean.id, bean);
 	}
 }

@@ -48,7 +48,8 @@ public class RemoteInvoker {
 			out = MethodUtils.invokeMethod(info.service, info.methodName, args);
 		} catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException e) {
 			// Bug in calling method
-			throw new RuntimeException(info.service.getClass().getSimpleName()+"#"+info.methodName+"("+args+")", e);
+			logger.error(info.service.getClass().getSimpleName()+"#"+info.methodName+"("+args+")", e);
+			out = e;
 		} catch (InvocationTargetException e){
 			// Exception in service method
 			logger.error(e.getMessage(), e.getCause());
