@@ -8,11 +8,14 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import lombok.val;
 
 
 import org.apache.commons.beanutils.BeanUtils;
@@ -284,29 +287,30 @@ public class CommonDao{
 		}
 		return renameMap;
 	}
-	
+
 	/**
-	 * BigDecimal用Nullを許可するコンバーター。
-	 * @author sbisec
-	 *
+	 * Nullを許可するコンバーター。
 	 */
-	private static class BigDecimalNullableConverter implements Converter {
+	private static class NullableConverter implements Converter {
 		Converter converter;
-		public BigDecimalNullableConverter(Converter converter){
+		public NullableConverter(Converter converter){
 			this.converter = converter;
 		}
 		@SuppressWarnings("rawtypes")
 		@Override
 		public Object convert(Class type, Object value) {
 			if(value==null){
-				return new BigDecimal(0);
+				return null;
 			}
 			return converter.convert(type, value);
 		}
 	}
 	static{
-		ConvertUtilsBean convertUtilsBean = BeanUtilsBean.getInstance().getConvertUtils();
-		Converter org = convertUtilsBean.lookup(BigDecimal.class);
-		convertUtilsBean.register(new BigDecimalNullableConverter(org), BigDecimal.class);
+		val convertUtilsBean = BeanUtilsBean.getInstance().getConvertUtils();
+		val bigDecimalConverter = convertUtilsBean.lookup(BigDecimal.class);
+		convertUtilsBean.register(new NullableConverter(bigDecimalConverter), BigDecimal.class);
+
+		val dateConverter = convertUtilsBean.lookup(Date.class);
+		convertUtilsBean.register(new NullableConverter(dateConverter), Date.class);
 	}
 }
