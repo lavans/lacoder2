@@ -127,4 +127,14 @@ public class ServiceManager { // implements ServiceManager{
 
 		return service;
 	}
+
+	/**
+	 * Remove class info cache.
+	 *
+	 * @param key
+	 */
+	public static void removeCache(String id){
+		serviceMap.remove(id);
+		serviceLocalMap.remove(id);
+	}
 }

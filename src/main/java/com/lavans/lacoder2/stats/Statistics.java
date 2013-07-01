@@ -4,9 +4,12 @@
  */
 package com.lavans.lacoder2.stats;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import lombok.val;
 
 import com.lavans.lacoder2.lang.MethodUtils;
 
@@ -51,7 +54,9 @@ public class Statistics{
 	 * @return
 	 */
 	public Collection<StatsRecord> getRecords(){
-		return keyMap.values();
+		val result = new ArrayList<StatsRecord>();
+		result.addAll(keyMap.values());
+		return result;
 	}
 }
 

@@ -239,9 +239,9 @@ public class BeanManager {
 	public static void setBean(String id, String className){
 		BeanInfo bean = new BeanInfo(id, className);
 		beanMap.put(id, bean);
+		ServiceManager.removeCache(id);
 	}
 	public static void setBean(Class<?> idClass, Class<?> beanClass){
-		BeanInfo bean = new BeanInfo(idClass.getName(), beanClass.getName());
-		beanMap.put(bean.id, bean);
+		setBean(idClass.getName(), beanClass.getName());
 	}
 }

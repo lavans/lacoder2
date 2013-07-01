@@ -4,6 +4,7 @@
  */
 package com.lavans.lacoder2.stats;
 
+import java.io.Serializable;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -11,7 +12,9 @@ import java.util.TreeSet;
  * @author dobashi
  * @version 1.00
  */
-public class StatsRecord {
+public class StatsRecord implements Serializable{
+	private static final long serialVersionUID = -6813487062660776502L;
+
 	private String key=null;
 	private int callCount = 0;
 	private long totalCostTime = 0;
@@ -91,8 +94,8 @@ public class StatsRecord {
 	public long getMaxCostTime() {
 		return maxCostTime;
 	}
-	
-	
+
+
 	// for BeanUtils/JSON
 	public void setTotalCostTime(long totalCostTime) {
 		this.totalCostTime = totalCostTime;
@@ -101,7 +104,7 @@ public class StatsRecord {
 	public void setMaxCostTime(long maxCostTime) {
 		this.maxCostTime = maxCostTime;
 	}
-	
+
 	@Override
 	public String toString(){
 		return key+"["+callCount+"]";

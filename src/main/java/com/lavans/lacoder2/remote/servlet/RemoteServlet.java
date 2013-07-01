@@ -73,7 +73,7 @@ public class RemoteServlet extends HttpServlet {
 
 	/**
 	 * POST method.
-	 * リモート受付。受け付けたjsonからservice,method,inを取り出して実行し、outをjsonで返す。
+	 * リモート受付。受け付けたjsonからservice,method,inを取り出して実行します。
 	 *
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -94,7 +94,7 @@ public class RemoteServlet extends HttpServlet {
 //		String[] argsStrs = argsStr.substring(1, argsStr.length()-1).split(",");
 		Object args[] = ObjectSerializer.deserialize(argsStr);
 
-//				new Object[parameterTypes.length];
+//		Object args[] = new Object[parameterTypes.length];
 //		for(int i=0; i<parameterTypes.length; i++){
 //			args[i] = JSON.decode("["+argsStrs[i]+"]", parameterTypes[i]);
 //		}

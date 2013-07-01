@@ -37,7 +37,12 @@ public class RemoteInterceptor implements MethodInterceptor{
 			return null;
 		}
 
-		return connector.execute(method, args);
+		Object out = connector.execute(method, args);
+		if(out instanceof Throwable){
+			throw (Throwable)out;
+		}
+		return out;
+
 //		Object json = connector.execute(method, args);
 //		Object out = JSON.decode((String)json, method.getReturnType());
 //		return out;

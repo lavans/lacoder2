@@ -3,7 +3,6 @@
 package com.lavans.lacoder2.remote.connector.impl;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
@@ -59,11 +58,7 @@ public class SingleConnector implements Connector{
 			// ログへ出力
 			logger.debug("remote execute["+ methodStr +"] return [" + result +"]");
 
-			if(result instanceof RuntimeException){
-				throw (RuntimeException)result;
-			}else if(result instanceof Throwable){
-				throw new RuntimeException((Throwable)result);
-			}
+			ResultChecker.checkThrowable(result);
 			return result;
 		}catch (IOException e) {
 			logger.debug("remote execute["+ methodStr +"] error"+ e.getMessage());

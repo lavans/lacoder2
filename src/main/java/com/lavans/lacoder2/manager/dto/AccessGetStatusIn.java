@@ -1,4 +1,6 @@
 package com.lavans.lacoder2.manager.dto;
 
-public class AccessGetStatusIn {
+import java.io.Serializable;
+
+public class AccessGetStatusIn implements Serializable {
 }

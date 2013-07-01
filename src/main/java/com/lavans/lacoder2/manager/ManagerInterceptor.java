@@ -3,18 +3,11 @@ package com.lavans.lacoder2.manager;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
-import java.util.concurrent.TimeUnit;
 
-import net.arnx.jsonic.JSON;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
 
-import org.slf4j.Logger;
-
-import com.google.common.base.Stopwatch;
 import com.lavans.lacoder2.di.BeanManager;
-import com.lavans.lacoder2.lang.LogUtils;
-import com.lavans.lacoder2.lang.PeriodUtils;
 import com.lavans.lacoder2.remote.connector.ConnectManager;
 import com.lavans.lacoder2.remote.connector.Connector;
 import com.lavans.lacoder2.remote.connector.impl.FixedConnector;
@@ -22,8 +15,6 @@ import com.lavans.lacoder2.remote.node.ServerGroup;
 import com.lavans.lacoder2.remote.node.ServerNode;
 
 public class ManagerInterceptor implements MethodInterceptor,InvocationHandler{
-	/** Logger */
-	private static Logger logger = LogUtils.getLogger();
 	/** ConnectManager */
 	private ConnectManager connectManager = BeanManager.getBean(ConnectManager.class);
 
@@ -34,6 +25,10 @@ public class ManagerInterceptor implements MethodInterceptor,InvocationHandler{
 
 	@Override
 	public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable {
+		if(isLocalOnly(method)){
+			return method.invoke(obj, args);
+		}
+
 		Object out = connector.execute(method, args);
 		return out;
 	}
@@ -57,4 +52,19 @@ public class ManagerInterceptor implements MethodInterceptor,InvocationHandler{
 		return connector;
 	}
 
+	private static final String FINALIZE="finalize";
+	/**
+	 * Check if method is local only or remote method.
+	 *
+	 * @param method
+	 * @return true: local
+	 * 			 false: remote
+	 */
+	private boolean isLocalOnly(Method method){
+		if(method.getName().equals(FINALIZE)){
+			return true;
+		}
+
+		return false;
+	}
 }

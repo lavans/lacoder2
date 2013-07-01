@@ -1,12 +1,13 @@
 package com.lavans.lacoder2.manager.dto;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
 import com.lavans.lacoder2.remote.node.ServerNode;
 
 
-public class AccessGetStatusOut {
+public class AccessGetStatusOut implements Serializable{
 	private Map<String, List<ServerNode>> accessMap;
 
 	public Map<String, List<ServerNode>> getAccessMap() {

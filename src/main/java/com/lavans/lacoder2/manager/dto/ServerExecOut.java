@@ -1,6 +1,8 @@
 package com.lavans.lacoder2.manager.dto;
 
-public class ServerExecOut {
+import java.io.Serializable;
+
+public class ServerExecOut implements Serializable{
 	private String stdout;
 	private String stderr;
 	public String getStdout() {

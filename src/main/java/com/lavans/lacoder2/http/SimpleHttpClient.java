@@ -188,7 +188,7 @@ public class SimpleHttpClient {
 		logger.debug(urlStr); // + (postData==null?"":" post["+ postData +"]"));
 
 		if(urlStr.contains("java.lang")){
-			logger.error(urlStr + " contains JDK class.");
+			throw new RuntimeException(urlStr + " contains JDK class.");
 		}
 
 		// POSTの時

@@ -18,11 +18,8 @@ import com.lavans.lacoder2.manager.dto.ServerExecIn;
 import com.lavans.lacoder2.manager.dto.ServerExecOut;
 import com.lavans.lacoder2.manager.dto.ServerGetStatsIn;
 import com.lavans.lacoder2.manager.dto.ServerGetStatsOut;
-import com.lavans.lacoder2.manager.dto.ServerRefreshHashIn;
-import com.lavans.lacoder2.manager.dto.ServerRefreshHashOut;
 import com.lavans.lacoder2.remote.node.ServerGroup;
 import com.lavans.lacoder2.remote.node.ServerNode;
-import com.lavans.lacoder2.security.auth.AuthenticationManager;
 import com.lavans.lacoder2.stats.Statistics;
 
 public class ServerService {
@@ -30,7 +27,7 @@ public class ServerService {
 
 	/**
 	 * Get Service from id
-	 * 
+	 *
 	 * @param id
 	 * @return
 	 */
@@ -62,10 +59,10 @@ public class ServerService {
 		out.setStderr(executor.getStderr());
 		return out;
 	}
-	
+
 	/**
 	 * 接続先一覧を返します。
-	 * 
+	 *
 	 * @param in
 	 * @return
 	 */
@@ -81,7 +78,7 @@ public class ServerService {
 
 	/**
 	 * 接続ON/OFFを設定します。
-	 * 
+	 *
 	 * @param in
 	 * @return 設定結果
 	 */
@@ -100,20 +97,4 @@ public class ServerService {
 		}
 		return out;
 	}
-	
-	/** 認証マネージャ */
-	private AuthenticationManager authenticationManager = BeanManager.getBean(AuthenticationManager.class);
-	/**
-	 * ハッシュを更新します。
-	 * @param in
-	 * @return
-	 */
-	public ServerRefreshHashOut refreshHash(ServerRefreshHashIn in){
-		ServerRefreshHashOut out = new  ServerRefreshHashOut();
-		// リセットハッシュ実施
-		Boolean result = authenticationManager.resetHash();
-		out.addMessage(result.toString());
-		return out;
-	}
-
 }
