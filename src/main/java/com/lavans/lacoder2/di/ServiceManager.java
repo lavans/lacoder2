@@ -105,9 +105,7 @@ public class ServiceManager { // implements ServiceManager{
 
 		service = createService(clazz, new TransactionInterceptor());
 		serviceLocalMap.put(id, service);
-		if(id.startsWith("Admin")){
-			logger.debug("Add ServiceLocal "+ id);
-		}
+
 		return (T)service;
 	}
 
