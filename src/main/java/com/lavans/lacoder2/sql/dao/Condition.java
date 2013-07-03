@@ -18,6 +18,7 @@ import static com.lavans.lacoder2.sql.dao.ConditionTypeEnum.OR_SUFFIX_SEARCH;
 import static com.lavans.lacoder2.sql.dao.ConditionTypeEnum.PREFIX_SEARCH;
 import static com.lavans.lacoder2.sql.dao.ConditionTypeEnum.SUFFIX_SEARCH;
 
+import java.io.Serializable;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -32,7 +33,9 @@ import com.lavans.lacoder2.lang.StringUtils;
  * @author dobashi
  *
  */
-public class Condition implements Cloneable{
+public class Condition implements Serializable, Cloneable{
+	private static final long serialVersionUID = 1L;
+
 	/** Parameter with sort order */
 	private LinkedHashMap<String, String[]> params = new LinkedHashMap<>();
 
@@ -119,7 +122,7 @@ public class Condition implements Cloneable{
 		repeatable(field, value, OR_SUFFIX_SEARCH);
 		return this;
 	}
-	
+
 	/**
 	 * OR検索の場合等、同名のキーで繰り返し登録できるようにキーに連番を振って登録する。
 	 * @param field
@@ -133,10 +136,10 @@ public class Condition implements Cloneable{
 		do{
 			key=baseKey+"."+i++;
 		}while(params.containsKey(key));
-		
+
 		params.put(key, new String[]{value});
 	}
-	
+
 	public Condition fuzzySearch(String field, String value){
 		params.put(field+"."+FUZZY_SEARCH.toString(), new String[]{value});
 		return this;
