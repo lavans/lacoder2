@@ -23,6 +23,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import com.lavans.lacoder2.lang.StringUtils;
+import com.lavans.lacoder2.util.Parameterizable;
 
 
 /**
@@ -33,7 +34,7 @@ import com.lavans.lacoder2.lang.StringUtils;
  * @author dobashi
  *
  */
-public class Condition implements Serializable, Cloneable{
+public class Condition implements Serializable, Cloneable, Parameterizable{
 	private static final long serialVersionUID = 1L;
 
 	/** Parameter with sort order */
@@ -245,5 +246,15 @@ public class Condition implements Serializable, Cloneable{
 	public Condition offset(int offset) {
 		this.offset = offset;
 		return this;
+	}
+
+	@Override
+	public Map<String, String[]> getParameters(String prefix) {
+		return params;
+	}
+
+	@Override
+	public void setParameters(Map<String, String[]> map, String prefix) {
+		this.params = new LinkedHashMap<>(DaoUtils.getConditionMap(map, prefix));
 	}
 }

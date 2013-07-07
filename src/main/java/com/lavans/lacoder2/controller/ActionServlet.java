@@ -38,7 +38,7 @@ public class ActionServlet extends HttpServlet {
 
 	/**	serial id */
 	private static final long serialVersionUID = 1L;
-	
+
 	/** Action configuration. */
 	private WebAppConfig webAppConfig = BeanManager.getBean(WebAppConfig.class);
 
@@ -51,7 +51,7 @@ public class ActionServlet extends HttpServlet {
 	 * "?"以降も使用するため、直前のGETパラメータがquery-stringとして残ってしまう。これをrequest.getParamterMap()
 	 * すると前回のGETパラメータと今回のPOSTパラメータの両方が取得できる。これを避けるため
 	 * query-string破棄、自前でRequestBodyをInputStream経由で取得する。
-	 * 
+	 *
 	 * 文字コードはParameterUtils.toMap()で行うのでrequest.setCharacterEncoding(env)は使わない。
 	 *
 	 *
@@ -68,10 +68,11 @@ public class ActionServlet extends HttpServlet {
 				query += '\n'+line;
 			}
 			br.close();
+			if(query.startsWith("\n")) query = query.substring(1);
 		}catch (IOException e){
 			throw new RuntimeException(e);
 		}
-		
+
 		// wrap for
 		HttpRequestParamWrapper request= new HttpRequestParamWrapper(requestOrg);
 
@@ -152,12 +153,12 @@ public class ActionServlet extends HttpServlet {
 			logger.debug("\n===================== "+ info.actionName + ActionInfo.METHOD_SPLITTER + info.methodName +"() end =====================");
 
 			jspFile = postAction(action, info, request, response, jspFile);
-			
+
 			if(!response.isCommitted()){
 				getServletContext().getRequestDispatcher(webAppConfig.jspPath+info.relativePath+"/"+jspFile).forward(request, response);
 			}
 		} catch (Exception e) {
-			
+
 			handleException(e, request, response);
 		}finally{
 			// log URI, execute time, request parameters.
@@ -169,7 +170,7 @@ public class ActionServlet extends HttpServlet {
 
 	/**
 	 * Get ActionURI from request.
-	 * 
+	 *
 	 * @param request
 	 * @return
 	 */
@@ -207,7 +208,7 @@ public class ActionServlet extends HttpServlet {
 		action = setRelative(request, action);
 		// ".." check
 		action = checkParent(request, action);
-		
+
 		return action;
 	}
 
@@ -233,10 +234,10 @@ public class ActionServlet extends HttpServlet {
 
 		return result;
 	}
-	
+
 	/**
 	 * Get query string.
-	 * 
+	 *
 	 * @param request
 	 * @param action
 	 * @return
@@ -249,10 +250,10 @@ public class ActionServlet extends HttpServlet {
 		}
 		return action;
 	}
-	
+
 	/**
 	 * if action starts with not "/", the next action path is relative path from prev action.
-	 * 
+	 *
 	 * @param action
 	 * @return
 	 */
@@ -265,10 +266,10 @@ public class ActionServlet extends HttpServlet {
 		}
 		return action;
 	}
-	
+
 	/**
 	 * if action path contains "..", shorten path.
-	 * 
+	 *
 	 * @param request
 	 * @param action
 	 * @return
@@ -279,7 +280,7 @@ public class ActionServlet extends HttpServlet {
 			String first = action.substring(0,index-1);
 			first = first.substring(0, first.lastIndexOf("/"));
 			String second = action.substring(index+2, action.length());
-	
+
 			action = first + second;
 			logger.debug(action);
 		}
@@ -288,7 +289,7 @@ public class ActionServlet extends HttpServlet {
 
 	/**
 	 * Get Action URI from request path.
-	 * 
+	 *
 	 * @param request
 	 * @return
 	 */
@@ -300,7 +301,7 @@ public class ActionServlet extends HttpServlet {
 		if(!webAppConfig.extenstions.contains(extension)){
 			return null;
 		}
-		
+
 		// remove extension
 		actionURI = actionURI.substring(0, actionURI.length()-(extension.length()+1));
 
@@ -323,10 +324,10 @@ public class ActionServlet extends HttpServlet {
 			filter.preAction(request, response, info);
 		}
 	}
-	
+
 	/**
 	 * Set Context info.
-	 * 
+	 *
 	 * @param info
 	 * @param request
 	 * @param response
@@ -370,11 +371,11 @@ public class ActionServlet extends HttpServlet {
 
 		return jspFile;
 	}
-	
+
 	/**
 	 * Handle Exception
 	 * @param e
-	 * @throws ServletException 
+	 * @throws ServletException
 	 */
 	private void handleException(Exception e, HttpServletRequest request, HttpServletResponse response) throws ServletException{
 		// Get nested Exception

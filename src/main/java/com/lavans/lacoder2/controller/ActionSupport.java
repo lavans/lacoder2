@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -70,14 +71,18 @@ public class ActionSupport {
 	 * @param url
 	 * @throws IOException
 	 */
-	public String redirect(String url) throws IOException {
+	public String redirect(String url) {
 		// "/"で始まるならContextPathを足す
 		if(url.startsWith("/")){
 			url = request.getContextPath()+url;
 		}
 		url = response.encodeRedirectURL(url);
-		response.sendRedirect(url);
-		
+		try {
+			response.sendRedirect(url);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+
 		return NO_JSP;
 	}
 
@@ -94,6 +99,16 @@ public class ActionSupport {
 		this.response = response;
 	}
 
+	/**
+	 * set request attribute
+	 * @param key
+	 * @param value
+	 */
+	public void setAllAttribute(Map<String, Object> map){
+		for(Entry<String, Object> entry: map.entrySet()){
+			request.setAttribute(entry.getKey(), entry.getValue());
+		}
+	}
 	/**
 	 * set request attribute
 	 * @param key

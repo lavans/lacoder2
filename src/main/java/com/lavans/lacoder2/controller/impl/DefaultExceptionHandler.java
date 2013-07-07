@@ -20,13 +20,13 @@ public class DefaultExceptionHandler implements ExceptionHandler{
 	private static Logger logger = LoggerFactory.getLogger(ExceptionHandler.class);
 
 	public DefaultExceptionHandler(){
-		
+
 	}
-	
+
 	public void handle(HttpServletRequest request, HttpServletResponse response, Throwable t) throws ServletException,
 			IOException {
 		logger.error(ErrorUtils.getRequestDetailString(request), t);
 		request.setAttribute("exception", t);
-		request.getServletContext().getRequestDispatcher("/error/error.jsp").forward(request, response);
+		request.getServletContext().getRequestDispatcher("/WEB-INF/jsp/error/error.jsp").forward(request, response);
 	}
 }

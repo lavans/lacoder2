@@ -132,16 +132,6 @@ public class DaoUtils {
 	}
 
 	/**
-	 * make SQL condition from HtttpServletRequest
-	 * @param request
-	 * @param prefix
-	 * @return
-	 */
-	public static Condition getCondition(HttpServletRequest request,  String prefix){
-		return new Condition(getConditionMap(request.getParameterMap(), prefix));
-	}
-
-	/**
 	 * make SQL condition from parameter map<String, String[]>
 	 *
 	 * @param request
@@ -215,7 +205,7 @@ public class DaoUtils {
 			phrase = phrase.replace("( AND ", "(");
 			phrase = " WHERE "+ phrase;
 		}
-		
+
 		return phrase;
 	}
 
@@ -235,10 +225,10 @@ public class DaoUtils {
 
 		return result;
 	}
-	
+
 	/** TODO DbmsType */
-	private static DbmsType dbmsType=DbmsType.ORACLE;
-	
+	private static DbmsType dbmsType=DbmsType.POSTGRES;
+
 	/**
 	 * Limit/Offsetの設定
 	 * @param cond
@@ -283,7 +273,7 @@ public class DaoUtils {
 		}
 		return result;
 	}
-	
+
 	/**
 	 * キーからフィールド名のみを取得
 	 * @param key
@@ -297,7 +287,7 @@ public class DaoUtils {
 		}
 		return key;
 	}
-	
+
 	/**
 	 * 型に応じてパラメータをセット
 	 * @param clazz

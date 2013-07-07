@@ -20,7 +20,7 @@ import com.lavans.lacoder2.remote.node.ServerNode;
 public class RoundrobinSelector implements Selector{
 	/** logger */
 	private static Logger logger = LogUtils.getLogger();
-	
+
 	protected int current;
 	/**
 	 * 有効な接続先を探して、見つかればConnectした状態のhttpClientを返します。
@@ -45,17 +45,18 @@ public class RoundrobinSelector implements Selector{
 				logger.warn(e.getMessage());
 				// 接続に失敗したらofflineにする。
 				node.setOffline();
+				nodeList.remove(node);
 				ServerGroup.save();
 			}
 		}
 		// 有効な接続先がなければRuntimeException
 	}
-	
+
 	/**
 	 * 次のノードを探す。
 	 * 次のノードがエラーになっていたらその次を返す。
 	 * カレントノードが最後のノードだったら最初のノードをに戻る。
-	 * 
+	 *
 	 * @param list
 	 * @return
 	 * @throws RuntimeException 接続先が見つからない場合
@@ -65,15 +66,14 @@ public class RoundrobinSelector implements Selector{
 		if(list.size()==0){
 			throw new RuntimeException("No server found.");
 		}
-		
+
 		// current+1とマッチするものを探す
 		int next = current+1;
 		for(ServerNode node: list){
 			// nextがエラーの時にはその次でマッチするように>=にする
 			if(node.getIndex()>=next && node.isOnline()) return node;
 		}
-		
-		// マッチするものが無かったら最初のノード
+
 		return list.get(0);
 	}
 }
