@@ -9,9 +9,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.servlet.http.HttpServletRequest;
-
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,43 +25,6 @@ public class DaoUtils {
 
 	/**
 	 * IN句の文字列作成
-	 * @param <T>
-	 * @param objs
-	 * @param prefix
-	 * @return
-	 */
-	public static String makeInPhrase(String[] objs, String prefix){
-		if(objs.length==0) throw new IllegalArgumentException("target's length==0.");
-		StringBuilder str = new StringBuilder();
-		for(int i=0; i<objs.length; i++){
-			str.append(",:"+prefix+i);
-		}
-		return str.substring(1);
-	}
-
-	/**
-	 * IN句の文字列作成。
-	 * パラメータMapへの格納処理あり。
-	 * TODO このメソッドいらない気がするので要検討
-	 *
-	 * @param <T>
-	 * @param objs
-	 * @param prefix
-	 * @param params パラメータ用Map。ここに格納される。
-	 * @return
-	 */
-//	public static String makeInPhrase(String[] objs, String prefix, Map<String, String[]> params){
-//		if(objs.length==0) throw new IllegalArgumentException("target's length==0.");
-//		StringBuilder str = new StringBuilder();
-//		for(int i=0; i<objs.length; i++){
-//			str.append(",:"+prefix+i);
-//			params.put(prefix+i, new String[]{objs[i]});
-//		}
-//		return str.substring(1);
-//	}
-
-	/**
-	 * IN句の文字列作成
 	 * 任意の型。
 	 *
 	 * @param <T>
@@ -73,6 +33,15 @@ public class DaoUtils {
 	 * @param params パラメータ用Map。ここに格納される。
 	 * @return
 	 */
+	public static String makeInPhrase(String[] objs, String prefix, Map<String, String[]> params){
+		if(objs.length==0) throw new IllegalArgumentException("target's length==0.");
+		StringBuilder str = new StringBuilder();
+		for(int i=0; i<objs.length; i++){
+			str.append(",:"+prefix+i);
+			params.put(prefix+i, new String[]{objs[i]});
+		}
+		return " IN ("+str.substring(1) +")";
+	}
 	public static <T> String makeInPhrase(T[] objs, String prefix, Map<String, Object> params){
 		if(objs.length==0) throw new IllegalArgumentException("target's length==0.");
 		StringBuilder str = new StringBuilder();
@@ -80,7 +49,7 @@ public class DaoUtils {
 			str.append(",:"+prefix+i);
 			params.put(prefix+i, objs[i]);
 		}
-		return str.substring(1);
+		return " IN ("+str.substring(1) +")";
 	}
 
 	public static String getSql(Class<?> clazz, String key){

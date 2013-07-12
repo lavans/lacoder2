@@ -135,12 +135,12 @@ public enum ConditionTypeEnum {
 		public void processCondition(String key, String field, StringBuilder builder, Map<String, String[]> cond){
 		}
 	},
-	
+
 	LIMIT{
 		public void processCondition(String key, String field, StringBuilder builder, Map<String, String[]> cond){
 		}
 	};
-	
+
 	@Override
 	public String toString(){
 		return StringUtils.toCamelCase(name());
@@ -161,19 +161,13 @@ public enum ConditionTypeEnum {
 			String values[],
 			Operator andor){
 		String attributeName = key.substring(0, key.indexOf("."));
-		builder.append(andor + field +" IN ( "+ DaoUtils.makeInPhrase(values ,attributeName+".multiple.") +")");
 		condMap.remove(key);
-		for(int i=0; i<values.length; i++){
-			condMap.put(key+"."+i, new String[]{values[i]});
-		}
+		builder.append(andor + field + DaoUtils.makeInPhrase(values ,attributeName+".multiple.", condMap));
 	}
 	public abstract void processCondition(String key, String field, StringBuilder builder, Map<String, String[]> cond);
 //	EQUAL("="),GREATER_EQUAL(">="),LESS_OR_EQUAL("<="),FUZZY_SEARCH(" LIKE "),LIST,MULTIPLE;
 //	String equotation;
-//	private CondTypeEnum(String equotation){
-//		this.equotation = equotation;
-//	}
-	
+
 	private enum Operator {
 		AND, OR;
 		@Override public String toString(){
