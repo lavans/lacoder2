@@ -4,12 +4,19 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import lombok.val;
 
+
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.beanutils.PropertyUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import ch.qos.logback.classic.gaffer.PropertyUtil;
 
 import com.lavans.lacoder2.di.BeanManager;
 import com.lavans.lacoder2.lang.StringUtils;
@@ -419,6 +426,16 @@ public class BaseDao{
 		}
 
 		return result;
+//		try {
+//		val map =  PropertyUtils.describe(obj);
+//		map.remove("attributeMap");
+//		map.remove("class");
+//		map.remove("parameters");
+//		return map;
+//	} catch (IllegalAccessException | InvocationTargetException
+//			| NoSuchMethodException e) {
+//		throw new RuntimeException(e);
+//	}
 	}
 
 	/**
@@ -426,15 +443,21 @@ public class BaseDao{
 	 * @param obj
 	 * @return
 	 */
-	@SuppressWarnings("unchecked")
-	private Map<String, Class<?>> getAttributeInfo(Class<?> clazz) {
-		Map<String, Class<?>> result=null;
-		try {
-			Method method = clazz.getMethod("getAttributeInfo", (Class<?>[])null);
-			result = (Map<String, Class<?>>)method.invoke(null, (Object[])null);
-		} catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-			throw new RuntimeException(e);
+	private Map<String, Class<?>> getAttributeInfo(Class<?> beanClass) {
+		val descriptors =  PropertyUtils.getPropertyDescriptors(beanClass);
+		val result = new HashMap<String, Class<?>>();
+		for(val desc: descriptors){
+			result.put(desc.getName(), desc.getPropertyType());
 		}
 		return result;
 	}
+//
+//		try {
+//			Method method = clazz.getMethod("getAttributeInfo", (Class<?>[])null);
+//			result = (Map<String, Class<?>>)method.invoke(null, (Object[])null);
+//		} catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+//			throw new RuntimeException(e);
+//		}
+//		return result;
+//	}
 }

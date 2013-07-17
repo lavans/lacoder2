@@ -165,7 +165,7 @@ public class NumberUtils extends org.apache.commons.lang3.math.NumberUtils{
 				list.add(value);
 			}
 		}
-		return (Integer[])list.toArray();
+		return list.toArray(new Integer[]{});
 	}
 
 	/**
