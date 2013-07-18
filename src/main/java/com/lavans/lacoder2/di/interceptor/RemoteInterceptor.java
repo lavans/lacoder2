@@ -2,6 +2,8 @@
 package com.lavans.lacoder2.di.interceptor;
 
 import java.lang.reflect.Method;
+import java.util.HashSet;
+import java.util.Set;
 
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
@@ -48,7 +50,14 @@ public class RemoteInterceptor implements MethodInterceptor{
 //		return out;
 	}
 
-	private static final String FINALIZE="finalize";
+	/** local execute method names */
+	private static Set<String> localMethodNameSet = new HashSet<String>(){
+		private static final long serialVersionUID = 1L;
+	{
+		add("finalize");
+		add("toString");
+	}};
+
 	/**
 	 * Check if method is local only or remote method.
 	 *
@@ -57,10 +66,6 @@ public class RemoteInterceptor implements MethodInterceptor{
 	 * 			 false: remote
 	 */
 	private boolean isLocalOnly(Method method){
-		if(method.getName().equals(FINALIZE)){
-			return true;
-		}
-
-		return false;
+		return localMethodNameSet.contains(method.getName());
 	}
 }
