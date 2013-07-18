@@ -266,9 +266,9 @@ public class DaoUtils {
 	 * @return
 	 */
 	private static Map<String, Object> setValue(Class<?> clazz, String key, String value, Map<String, Object> result){
-		if(clazz.equals(Integer.class)){
+		if(clazz.equals(Integer.class) || clazz.equals(Integer.TYPE)){
 			result.put(key, Integer.valueOf(value));
-		}else if(clazz.equals(Long.class)){
+		}else if(clazz.equals(Long.class) || clazz.equals(Long.TYPE)){
 			result.put(key, Long.valueOf(value));
 		}else if(clazz.equals(Double.class)){
 			result.put(key, Double.valueOf(value));
