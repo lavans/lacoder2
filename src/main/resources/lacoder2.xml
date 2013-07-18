@@ -6,6 +6,11 @@
 		<service-path>com.lavans.lacoder2.remote.servlet</service-path>
 	</web-app>
 
-	
+	<!-- dummy server group -->
+	<server-group name="bl">
+		<server-node name="bl1" uri="http://127.0.0.1:8080/bl/rs/" />
+	</server-group>
+
+
 	<parameter name="debug" value="true"/>
 </root>
