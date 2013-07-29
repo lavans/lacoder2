@@ -159,7 +159,7 @@ public class ParameterUtils {
 				if(ignoreEmpty && StringUtils.isEmpty(value)){
 					continue;
 				}
-				if(encoding!=null){
+				if(!StringUtils.isEmpty(value) && !StringUtils.isEmpty(encoding)){
 					try {
 						value = URLEncoder.encode(value, encoding);
 					} catch (UnsupportedEncodingException e) {}

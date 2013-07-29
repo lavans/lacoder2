@@ -104,7 +104,7 @@ public class ActionSupport {
 	 * @param key
 	 * @param value
 	 */
-	public void setAllAttribute(Map<String, Object> map){
+	public void setAllAttributes(Map<String, Object> map){
 		for(Entry<String, Object> entry: map.entrySet()){
 			request.setAttribute(entry.getKey(), entry.getValue());
 		}
