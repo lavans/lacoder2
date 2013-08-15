@@ -15,6 +15,7 @@ import com.lavans.lacoder2.di.BeanManager;
 import com.lavans.lacoder2.di.annotation.Scope;
 import com.lavans.lacoder2.di.annotation.Type;
 import com.lavans.lacoder2.http.HttpResponse;
+import com.lavans.lacoder2.lang.StringUtils;
 import com.lavans.lacoder2.remote.connector.Connector;
 import com.lavans.lacoder2.remote.connector.Selector;
 import com.lavans.lacoder2.remote.node.ServerGroup;
@@ -56,7 +57,7 @@ public class SingleConnector implements Connector{
 			HttpResponse response = info.client.request();
 			Object result = ObjectSerializer.deserialize(response.getContentsAsBinary());
 			// ログへ出力
-			logger.debug("remote execute["+ methodStr +"] return [" + result +"]");
+			logger.debug("remote execute["+ methodStr +"] return [" + chopResult(result) +"]");
 
 			ResultChecker.checkThrowable(result);
 			return result;
@@ -64,6 +65,11 @@ public class SingleConnector implements Connector{
 			logger.debug("remote execute["+ methodStr +"] error"+ e.getMessage());
 			throw new RuntimeException(e);
 		}
+	}
+
+	private String chopResult(Object src){
+		if(src==null) return null;
+		return StringUtils.substring(src.toString(), 0, 1000);
 	}
 
 	@Override
