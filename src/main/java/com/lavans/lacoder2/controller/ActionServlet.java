@@ -3,6 +3,7 @@ package com.lavans.lacoder2.controller;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -293,8 +294,14 @@ public class ActionServlet extends HttpServlet {
 	 * @param request
 	 * @return
 	 */
+	private static final String ENCODING_ORG="ISO-8859-1";
 	private String getActionFromPath(HttpServletRequest request){
-		String actionURI = request.getPathInfo();
+		String actionURI;
+		try {
+			actionURI = new String(request.getPathInfo().getBytes(ENCODING_ORG));
+		} catch (UnsupportedEncodingException e) {
+			throw new RuntimeException(e);
+		}
 		// Check whether action URI end with action-extention
 		String extension = actionURI.contains(".")?
 				actionURI.substring(actionURI.indexOf(".")+1):"";
