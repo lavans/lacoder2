@@ -5,7 +5,7 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
-
+import java.util.TreeMap;
 
 import org.slf4j.Logger;
 
@@ -147,6 +147,8 @@ public class ParameterUtils {
 		if (params == null){
 			return "";
 		}
+
+		params = new TreeMap<String, String[]>(params);
 
 		StringBuilder result = new StringBuilder();
 		for(Map.Entry<String, String[]> entry: params.entrySet()){
