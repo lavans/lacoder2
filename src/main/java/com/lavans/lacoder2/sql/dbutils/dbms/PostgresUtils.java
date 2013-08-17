@@ -1,11 +1,12 @@
 package com.lavans.lacoder2.sql.dbutils.dbms;
 
 import java.math.BigDecimal;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 
 import org.slf4j.Logger;
 
@@ -30,86 +31,84 @@ public class PostgresUtils implements DbmsUtils{
 	public String getDriverName(){
 		return "org.postgresql.Driver";
 	}
-	
+
 	/**
 	 * Return JDBC Connection String.
-	 * 
+	 *
 	 * @param ip
 	 * @param port
 	 * @param name
 	 * @return
 	 */
 	public String getUrl(String host, int port, String name){
-		return "jdbc:postgres:@$host:$port:$name"
+		return "jdbc:postgresql://$host:$port/$name"
 				.replace("$host", host)
 				.replace("$port", String.valueOf(port))
 				.replace("$name", name);
 	}
-	
+
 	/**
 	 * Return default database port.
 	 */
 	public int getDefaultPort(){
 		return 5432;
 	}
-	
+
 	private CommonDao dao = BeanManager.getBean(CommonDao.class);
 
 	/**
 	 * バージョンを返します。
 	 */
-	private static final String SQL_VERSION = "SELECT * FROM V$VERSION";
+	private static final String SQL_VERSION = "SELECT version()";
 	public String getVersion(){
 		List<Map<String, Object>> list = dao.executeQuery(SQL_VERSION, null, dbName);
-		return list.get(0).get("BANNER").toString();
+		return list.get(0).get("version").toString();
 	}
 
 	/**
 	 * テーブル名一覧を返します。
 	 */
-	private static final String SQL_TABLENAMES = "SELECT * FROM tab WHERE tabtype='TABLE' ORDER BY TNAME";
+	private static final String SQL_TABLENAMES =
+			"select tablename from pg_tables where tablename not like 'pg_%' and tablename not like 'sql_%' order by tablename;";
 	public List<String> getTableNames(){
 		List<String> tableNames = new ArrayList<>();
 		List<Map<String, Object>> list = dao.executeQuery(SQL_TABLENAMES, null, dbName);
 		for(Map<String, Object> map: list){
-			tableNames.add(map.get("TNAME").toString());
+			tableNames.add(map.get("tablename").toString());
 		}
 		return tableNames;
 	}
-	
+
 	/**
 	 * テーブル情報を返します。
 	 */
 	private static final String SQL_TABLE =
-			"";
+		"SELECT * FROM information_schema.columns WHERE table_name=:table"; // order by ordinal_position;
 	public Table getTable(String tableName){
 		Table table = new Table();
 		table.setName(tableName);
-		
+
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("table", tableName);
-		
+
 		List<Map<String, Object>> list = dao.executeQuery(SQL_TABLE, params, dbName);
 		for(Map<String, Object> map: list){
 			table.addColumn(makeTarget(map));
 		}
 		return table;
 	}
-	
+
 	private Column makeTarget(Map<String, Object> map){
 		logger.info(map.toString());
 		Column column = new Column();
-		column.setName(map.get("COLUMN_NAME").toString());
-		column.setLength(((BigDecimal)map.get("DATA_LENGTH")).intValue());
-		column.setDbType(map.get("DATA_TYPE").toString());
-		if(column.getDbType().equals("CHAR") || column.getDbType().equals("VARCHAR2")){
-			column.setDbType(column.getDbType()+"("+column.getLength()+")");
-		}
+		column.setName(map.get("column_name").toString());
+		column.setLength(map.get("numeric_scale")==null?0:(Integer)map.get("numeric_scale"));
+		column.setDbType(map.get("data_type").toString());
 		column.setJavaType(getJavaType(column.getDbType()));
-		column.setNullable(map.get("NULLABLE").equals("Y")?true:false);
+		column.setNullable(map.get("is_nullable").equals("YES")?true:false);
 		return column;
 	}
-	
+
 	/**
 	 * TODO
 	 * DBのTYPEからJavaのTypeを返す

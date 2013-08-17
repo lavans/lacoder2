@@ -23,9 +23,9 @@ public class OracleUtilsTest {
 		connectInfo = new DbmsConnectInfo();
 		connectInfo.setDbmsType(DbmsType.ORACLE);
 		connectInfo.setIp("192.168.100.118");
-		connectInfo.setDBName("et93");
-		connectInfo.setUser("etrade");
-		connectInfo.setPass("etrade");
+		connectInfo.setDbName("xxx");
+		connectInfo.setUser("xxx");
+		connectInfo.setPass("xxx");
 		database = Database.connect(connectInfo);
 	}
 
@@ -38,12 +38,12 @@ public class OracleUtilsTest {
 	public void getTable() {
 		logger.info(database.getTable("KABU_M").getColumnList().toString());
 	}
-	
+
 	@Test
 	public void testPK(){
 //		String sql = "select table_name from USER_CONSTRAINTS ";
 		String sql = "select table_name from USER_CONS_COLUMNS ";
-		
+
 //		String sql = "select * from USER_CONSTRAINTS where TABLE_NAME=$table";
 		sql = sql.replaceAll("\\$table", "'i_fund_quote'");
 		CommonDao dao = new CommonDao();
