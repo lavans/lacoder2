@@ -1,21 +1,11 @@
 package com.lavans.lacoder2.manager;
 
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.concurrent.ConcurrentMap;
 
-import javax.imageio.ImageIO;
-
-import net.arnx.jsonic.util.Base64;
 import net.sf.cglib.proxy.Enhancer;
 
-import com.google.common.base.Optional;
 import com.lavans.lacoder2.cache.CacheManager;
-import com.lavans.lacoder2.cache.CacheValue;
 import com.lavans.lacoder2.lang.StringUtils;
 import com.lavans.lacoder2.manager.dto.CaccheGetMapOut;
 import com.lavans.lacoder2.manager.dto.CacheClearIn;
@@ -37,7 +27,7 @@ public class CacheService {
 
 	/**
 	 * Get Service from id
-	 * 
+	 *
 	 * @param id
 	 * @return
 	 */
@@ -55,7 +45,7 @@ public class CacheService {
 	 * ManagerService取得。
 	 * cglibを使わずにProxy利用版。
 	 * TODO 未検証。インターフェースにする必要があるかも
-	 * 
+	 *
 	 * @param groupName
 	 * @param nodeName
 	 * @return
@@ -72,10 +62,10 @@ public class CacheService {
 //		}
 //	}
 
-	
+
 	/**
 	 * キャッシュ名一覧を返します。
-	 * 
+	 *
 	 * @param in　空
 	 * @return
 	 */
@@ -87,7 +77,7 @@ public class CacheService {
 
 	/**
 	 * キャッシュのキー一覧を返します。
-	 * 
+	 *
 	 * @param in.cacheName キャッシュ名
 	 * @return
 	 */
@@ -99,84 +89,23 @@ public class CacheService {
 
 	/**
 	 * キャッシュデータを返します。
-	 * 
+	 *
 	 * @param in
 	 * @return
 	 */
 	public CacheGetDetailOut getDetail(CacheGetDetailIn in) {
 		CacheGetDetailOut out = new CacheGetDetailOut();
-		Object value = CacheManager.getInstance(in.getCacheName()).getRaw(in.getKey());
+		Object value = CacheManager.getInstance(in.getCacheName()).get(in.getKey());
 
 		// Chartの時うまく返せないのでStringに変換してみる
-		out.setCacheValue(convert(value));
+		out.setCacheValue(value);
 		return out;
 	}
 
-	/**
-	 * JSONで送信できる型に変換します。 Chart画像の場合はそのままJSON.encodeできないのでBase64に変換します。
-	 * 
-	 * @param out
-	 * @return
-	 */
-	private Object convert(Object value) {
-		if (value instanceof CacheValue<?>) {
-			Object out = ((CacheValue<?>) value).getOut();
-			// ChartOutの時のBufferedImageがJSON.encodeできないので回避処理
-			if (out.getClass().getSimpleName().equals("ChartOut")) {
-				byte[] data = toBytes(out);
-				value = makeCacheValue((CacheValue<?>) value, Base64.encode(data));
-			} else if (out instanceof Optional) {
-				value = makeCacheValue((CacheValue<?>) value, ((Optional<?>) out).get());
-			}
-		}
-
-		return value;
-	}
-
-	/**
-	 * chart-plのChartOut型から、プロジェクト参照無しでリフレクションで
-	 * BufferedImageを取得してbyte[]に変換して返します。
-	 * 
-	 * @param out
-	 * @return
-	 */
-	private byte[] toBytes(Object out) {
-		byte[] data;
-		try {
-			Method method = out.getClass().getMethod("getImg", (Class<?>[]) null);
-			BufferedImage img = (BufferedImage) method.invoke(out, (Object[]) null);
-			ByteArrayOutputStream os = new ByteArrayOutputStream();
-			ImageIO.write(img, "gif", os);
-			os.flush();
-			data = os.toByteArray();
-			os.close();
-		} catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException
-				| InvocationTargetException | IOException e) {
-			throw new RuntimeException(e);
-		}
-		return data;
-	}
-
-	/**
-	 * 新しいCacheValueクラスを作ります。
-	 * 
-	 * @param src
-	 *            コピー元。expireDateをコピー。
-	 * @param out
-	 *            新しい値。
-	 * @return
-	 */
-	private CacheValue<Object> makeCacheValue(CacheValue<?> src, Object out) {
-		CacheValue<Object> cacheValue = new CacheValue<>();
-		cacheValue.setExpire(src.getExpire());
-		cacheValue.setOut(out);
-
-		return cacheValue;
-	}
 
 	/**
 	 * キャッシュをクリアします。
-	 * 
+	 *
 	 * @param in
 	 * @return
 	 */
@@ -200,14 +129,14 @@ public class CacheService {
 
 	/**
 	 * 正規表現によるキャッシュクリア
-	 * 
+	 *
 	 * @param map
 	 * @param regex
 	 */
-	private long clearCacheRegex(Map<String, ?> map, String regex) {
+	private <K,V> long clearCacheRegex(Map<K, V> map, String regex) {
 		long count = 0;
-		for (String key : map.keySet()) {
-			if (key.matches(regex)) {
+		for (K key : map.keySet()) {
+			if (key.toString().matches(regex)) {
 				map.remove(key);
 				count++;
 			}
@@ -217,7 +146,7 @@ public class CacheService {
 
 	/**
 	 * キャッシュをクリアします。
-	 * 
+	 *
 	 * @param in
 	 * @return
 	 */
@@ -240,13 +169,13 @@ public class CacheService {
 
 	/**
 	 * 全キャッシュリフレッシュ
-	 * 
+	 *
 	 * @param map
 	 * @param regex
 	 */
-	private long refreshCacheAll(CacheManager<?, ?> cache) {
+	private <K, V> long  refreshCacheAll(CacheManager<K, V> cache) {
 		long count = 0;
-		for (String key : cache.asMap().keySet()) {
+		for (K key : cache.asMap().keySet()) {
 			cache.refresh(key);
 			count++;
 		}
@@ -255,14 +184,14 @@ public class CacheService {
 
 	/**
 	 * 正規表現によるキャッシュリフレッシュ
-	 * 
+	 *
 	 * @param map
 	 * @param regex
 	 */
-	private long refreshCacheRegex(CacheManager<?, ?> cache, String regex) {
+	private <K, V> long refreshCacheRegex(CacheManager<K, V> cache, String regex) {
 		long count = 0;
-		for (String key : cache.asMap().keySet()) {
-			if (key.matches(regex)) {
+		for (K key : cache.asMap().keySet()) {
+			if (key.toString().matches(regex)) {
 				cache.refresh(key);
 				count++;
 			}
@@ -272,7 +201,7 @@ public class CacheService {
 
 	/**
 	 * キャッシュを初期化します。
-	 * 
+	 *
 	 * @param in
 	 * @return
 	 */
@@ -287,7 +216,7 @@ public class CacheService {
 
 	/**
 	 * キャッシュMap全体を返します。 重そうなので使わないかな。
-	 * 
+	 *
 	 * @param in
 	 * @return
 	 */

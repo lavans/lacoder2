@@ -1,6 +1,6 @@
 package com.lavans.lacoder2.cache;
 
-import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.*;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -12,8 +12,6 @@ import org.slf4j.Logger;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
-import com.lavans.lacoder2.cache.CacheManager;
-import com.lavans.lacoder2.cache.CacheValue;
 import com.lavans.lacoder2.cache.mock.MockCacheHandler;
 import com.lavans.lacoder2.di.BeanManager;
 import com.lavans.lacoder2.lang.LogUtils;
@@ -27,11 +25,11 @@ public class CacheManagerTest {
 	private static final Logger logger = LogUtils.getLogger();
 	/** テスト対象 */
 	CacheManager<String, Object> target = new CacheManager<>();
-	
+
 	/** テスト用パラメータ */
 	final String key = "key";
 	final Object value = "value";
-	
+
 	Statistics stats;
 
 	@BeforeTest
@@ -39,7 +37,7 @@ public class CacheManagerTest {
 		// targetインスタンス取得
 		target = BeanManager.getBean(CacheManager.class.getName());
 		target.setCacheHandler(new MockCacheHandler());
-		
+
 		// 統計
 		Deencapsulation.setField(CacheManager.class, "isStatistics", true);
 		stats = BeanManager.getBean(Statistics.class);
@@ -48,7 +46,7 @@ public class CacheManagerTest {
 
 	@Test
 	public void CacheHandlerをセットしたらManagerServiceに登録される() {
-		
+
 		// 検証
 		// ManagerServiceに登録されているか
 		CacheService service = BeanManager.getBean(CacheService.class);
@@ -65,27 +63,10 @@ public class CacheManagerTest {
 	}
 
 	@Test
-	public void getRawで生データCacheValue型が取得できる() {
-		target.get(key);
-		CacheValue<Object> actualCaccheValue = target.getRaw(key);
-		assertEquals(actualCaccheValue.getOut(), value);
-	}
-
-	@Test
 	public void asMapで取得できる() {
 		target.get(key);
-		Object actualFromMap = target.asMap().get(key).getOut();
+		Object actualFromMap = target.asMap().get(key);
 		assertEquals(actualFromMap, value);
-	}
-	
-	@Test
-	public void オルタナキーを登録したらダミーデータが返る事を確認() {
-		final String dummyKey = "dummyKey";
-		target.getAlternativeKeyList().add(dummyKey);
-		target.setCacheHandler(new MockCacheHandler());
-		
-		Object result = target.get(dummyKey);
-		assertEquals(result, "alternativeValue");
 	}
 
 	@Test
@@ -98,15 +79,15 @@ public class CacheManagerTest {
 	@Test
 	public void キャッシュカウント() {
 		final String key="cacheCountKey";
-		
+
 		// 3回コールする
 		target.get(key);
 		target.get(key);
 		target.get(key);
-		
+
 		// キャッシュヒット回数を取得
 		int count = getCount(stats.getRecords(), "CACHE:cacheCountKey");
-		
+
 		// 2回ならOK
 		assertEquals(count, 2);
 	}
@@ -126,7 +107,7 @@ public class CacheManagerTest {
 		final String key="invalidateKey";
 		final String statsKey="CACHE:invalidateKey";
 		Deencapsulation.setField(CacheManager.class, "isStatistics", true);
-		
+
 		// 初期化
 		stats.getRecords().clear();
 
@@ -143,7 +124,7 @@ public class CacheManagerTest {
 		target.get(key);
 		target.invalidate(key);
 		target.get(key);
-		// 以前のテストから増えていない事 
+		// 以前のテストから増えていない事
 		count = getCount(stats.getRecords(), statsKey);
 		assertEquals(count,  1);
 
@@ -162,14 +143,14 @@ public class CacheManagerTest {
 		final String key2="key2";
 		final String statsKey1="CACHE:invalidateKey1";
 		final String statsKey2="CACHE:invalidateKey2";
-		
+
 		target.get(key1);
 		target.get(key2);
 		// 全部無効
 		target.invalidateAll();
 		target.get(key1);
 		target.get(key2);
-		
+
 		assertEquals(getCount(stats.getRecords(), statsKey1),0);
 		assertEquals(getCount(stats.getRecords(), statsKey2),0);
 	}
@@ -194,7 +175,7 @@ public class CacheManagerTest {
 		// 一旦全部無効にして再登録
 		target.invalidateAll();
 		target.putAll(map);
-		
+
 		assertEquals(target.size(),3);
 	}
 
