@@ -150,7 +150,7 @@ public class DaoUtils {
 		}
 		String keys[] = key.split("\\.");
 		// memeberId -> MEMBER_ID
-		String field = StringUtils.toUnderscore(keys[0]).toUpperCase();
+		String field = StringUtils.toUnderscore(keys[0]);
 		String typeStr = StringUtils.toUnderscore(keys[1]).toUpperCase();
 		ConditionTypeEnum type = ConditionTypeEnum.valueOf(ConditionTypeEnum.class, typeStr);
 		type.processCondition(key, field, builder, map);
