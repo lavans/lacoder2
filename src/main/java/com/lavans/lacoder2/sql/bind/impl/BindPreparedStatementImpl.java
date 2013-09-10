@@ -33,6 +33,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.lavans.lacoder2.lang.MethodUtils;
 import com.lavans.lacoder2.lang.StringUtils;
 import com.lavans.lacoder2.sql.bind.BindPreparedStatement;
@@ -58,23 +59,24 @@ public class BindPreparedStatementImpl extends LoggingStatement implements BindP
 
 	/** ログ出力用のsql */
 	private String sql;
+	@VisibleForTesting
+	String getSql(){ return sql; }
 
 	/**
 	 * ログ用にバインドキー文字列(:member_id)を実際の値に変換する。
 	 *
 	 * @param sql
 	 */
-	private void logParam(String key, String value){
+	@VisibleForTesting void logParam(String key, String value){
 		// 値に正規表現があったらエスケープ
+		value = value.replace("\\", "\\\\");
 		value = value.replace("$", "\\$");
+		value = value.replace("(", "\\(");
+		value = value.replace(")", "\\)");
 
-		// ログの書き換え
-		sql = sql.replaceAll(key+" ",  value+" ");
-		sql = sql.replaceAll(key+",",  value+",");
-		sql = sql.replaceAll(key+"\t", value+"\t");
-		sql = sql.replaceAll(key+"\n", value+"\n");
-		sql = sql.replaceAll(key+"\r", value+"\r");
-		sql = sql.replaceAll(key+"\\)",  value+"\\)");
+		// ログの書き換え 単語区切り
+		sql = sql.replaceAll(key+"(\\W)",  value+"$1");
+		// ログの書き換え 行末
 		sql = sql.replaceAll(key+"$",  value+"");
 	}
 
