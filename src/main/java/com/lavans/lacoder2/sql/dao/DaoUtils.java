@@ -280,6 +280,8 @@ public class DaoUtils {
 //			result.put(key, byte.valueOf(value));
 		}else if(clazz.equals(Date.class) || clazz.equals(java.sql.Date.class)){
 			result.put(key, DateUtils.getDate(value));
+		}else if(clazz.equals(Boolean.class) || clazz.equals(Boolean.TYPE)){
+			result.put(key, Boolean.valueOf(value));
 		}else{
 			// String
 			result.put(key, value);
