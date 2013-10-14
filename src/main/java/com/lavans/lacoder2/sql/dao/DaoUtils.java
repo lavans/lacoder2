@@ -249,11 +249,11 @@ public class DaoUtils {
 	 * @param key
 	 * @return
 	 */
-	private static String getAttributeName(String key){
+	private static String getAttributeName(String key) {
 		// "."がある場合は属性名は"."より前の部分(ex memberId.equal
-		if(key.contains(".")){
-			String names[]=key.split("\\.");
-			return names[0];
+		if (key.contains(".")) {
+			String names[] = key.split("\\.");
+			return names[names.length - 2]; // 後ろから２つめ
 		}
 		return key;
 	}
