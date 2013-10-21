@@ -25,7 +25,7 @@ public abstract class ActionFilter {
 	 * @return true: filter this uri. false: do not filter.
 	 */
 	public boolean isFilter(String uri){
-		return false;
+		return true;
 	}
 
 	/**

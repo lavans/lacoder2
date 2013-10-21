@@ -24,7 +24,7 @@ import com.lavans.lacoder2.util.Config;
 public class ServerGroup implements Comparable<ServerGroup>{
 	/** logger */
 	private static final Logger logger = LoggerFactory.getLogger(ServerGroup.class);
-	
+
 	private static final String SERVER_GROUP="server-group";
 	private static final String SERVER_NODE="server-node";
 	private static final String SELF_NODE="self-node";
@@ -36,7 +36,7 @@ public class ServerGroup implements Comparable<ServerGroup>{
 
 	/** config reader */
 	private static Map<String, ServerGroup> groupMap = new ConcurrentSkipListMap<>();
-	
+
 	static {
 		load(Config.CONFIG_FILE);
 	}
@@ -47,11 +47,11 @@ public class ServerGroup implements Comparable<ServerGroup>{
 	public static void clear(){
 		groupMap.clear();
 	}
-	
+
 	/**
 	 * すべてのServerGroup一覧を返します。
 	 * 設定ファイルの記述順に並んでいます。
-	 * 
+	 *
 	 * @return
 	 */
 	public static List<ServerGroup> getAll(){
@@ -59,7 +59,7 @@ public class ServerGroup implements Comparable<ServerGroup>{
 //		Collections.sort(list);
 		return list;
 	}
-	
+
 
 	/**
 	 * load
@@ -92,7 +92,7 @@ public class ServerGroup implements Comparable<ServerGroup>{
 			}
 		}
 	}
-			
+
 	private static ServerNode createNode(Element node, int index){
 		ServerNode serverNode = new ServerNode(
 				node.getAttribute(ATTRIBUTE_NAME),
@@ -153,13 +153,13 @@ public class ServerGroup implements Comparable<ServerGroup>{
 	public boolean isLocal(){
 		return selector.equalsIgnoreCase("local");
 	}
-	
+
 	/**
 	 * ローカル接続のときのクラス名を返す
 	 * 同一パッケージの中でlocal/remoteを切り替えられるようにするため、
 	 * server定義の中にlocalの実クラス名を指定できるようにしたが、
 	 * この機能は使わない事になったので消すかも。
-	 * 
+	 *
 	 * @return
 	 */
 	public String getLocalClass(){
@@ -175,10 +175,10 @@ public class ServerGroup implements Comparable<ServerGroup>{
 	public boolean contains(String localName){
 		return find(name)!=null;
 	}
-	
+
 	/**
 	 * サーバーノードを名前から探します。
-	 * 
+	 *
 	 * @param name ノード名
 	 * @return サーバーノード。見つからない場合はnull。
 	 */
@@ -211,15 +211,15 @@ public class ServerGroup implements Comparable<ServerGroup>{
 	}
 	/**
 	 * ServerGroup名をセットします。
-	 * 
+	 *
 	 * @param groupName
 	 */
 	public void setName(String name) {
 		this.name = name;
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @return
 	 */
 	public List<ServerNode> getNodeList() {
@@ -232,7 +232,7 @@ public class ServerGroup implements Comparable<ServerGroup>{
 	 * 返却されるリストはコピーなので変更しても他への影響は有りません。
 	 * リスト内にあるサーバーノードはコピーではなく本体なので、
 	 * setOffline()等を呼び出すと他へも反映されます。
-	 * 
+	 *
 	 * @return connectionList
 	 */
 	public List<ServerNode> getOnlineList() {
@@ -242,19 +242,25 @@ public class ServerGroup implements Comparable<ServerGroup>{
 				list.add(node);
 			}
 		}
+
+		// onlineが0でも接続先が一つの場合は常にそれを返す
+		// 設定ファイルで自動オフライン機能のオフ
+		if(list.isEmpty() && nodeList.size()==1){
+			list.add(nodeList.first());
+		}
 		return list;
 	}
 
 	/**
 	 * 文字列表記を返します。
 	 * 名前:セレクタ:同期/非同期
-	 * 
+	 *
 	 */
 	@Override
 	public String toString(){
 		return ServerGroup.class.getSimpleName()+":"+name+":"+selector+":"+(isSync?"sync":"async");
 	}
-	
+
 	/**
 	 * 比較
 	 * @author sbisec

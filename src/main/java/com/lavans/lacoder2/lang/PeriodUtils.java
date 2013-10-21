@@ -12,11 +12,10 @@ public class PeriodUtils extends org.apache.commons.lang3.time.DateUtils{
 	private static Logger logger = LoggerFactory.getLogger(PeriodUtils.class);
 	/**
 	 * 引数で渡された時間(ミリ秒)をいい感じにフォーマットします。
-	 * 123000 -> 
+	 * 123000 ->
 	 * 時刻ではなくて経過時間などをフォーマットするユーティリティです。
-	 * DateUtilsじゃなくてPeriodUtilsに移動するか、そもそもJodaTimeを使うべきか。
-	 * 
-	 * 
+	 * そもそもJodaTimeを使うべきか。
+	 *
 	 * @param time
 	 * @return
 	 */
@@ -37,10 +36,10 @@ public class PeriodUtils extends org.apache.commons.lang3.time.DateUtils{
 		sb.insert(0,makePrettyString(period, 0, "d"));
 		return sb.toString();
 	}
-	
+
 	/**
 	 * 一つの時間単位分の文字列を作成します。
-	 * 
+	 *
 	 * @param src
 	 * @param unit
 	 * @param unitStr
@@ -59,7 +58,7 @@ public class PeriodUtils extends org.apache.commons.lang3.time.DateUtils{
 		}
 		return unitTime+unitStr;
 	}
-	
+
 	private static Map<String, TimeUnit> unitMap = new HashMap<String, TimeUnit>(){
 		private static final long serialVersionUID = 1L;
 		{
@@ -70,10 +69,10 @@ public class PeriodUtils extends org.apache.commons.lang3.time.DateUtils{
 			put("d", TimeUnit.DAYS);
 		}
 	};
-	
+
 	/**
 	 * 時間をパースします。"4d3h2m1s"のような文字列を読み取り、ミリ秒に変換します。
-	 * 
+	 *
 	 * @param str
 	 * @return
 	 */
@@ -86,14 +85,14 @@ public class PeriodUtils extends org.apache.commons.lang3.time.DateUtils{
 		if(strs.length%2!=0){
 			throw new IllegalArgumentException("Invalid format +'"+ str +"'.");
 		}
-		
+
 		long result=0;
 		for(int i=0; i<strs.length; i+=2){
 			result += parseData(strs[i], strs[i+1]);
 		}
 		return result;
 	}
-	
+
 	private static long parseData(String durationStr, String unitStr){
 		long duration = Long.parseLong(durationStr);
 		TimeUnit unit = unitMap.get(unitStr);
@@ -101,5 +100,5 @@ public class PeriodUtils extends org.apache.commons.lang3.time.DateUtils{
 			throw new IllegalArgumentException("'"+durationStr+unitStr + "'is not valid period.");
 		}
 		return unit.toMillis(duration);
-	}	
+	}
 }

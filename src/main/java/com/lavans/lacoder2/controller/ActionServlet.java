@@ -153,10 +153,12 @@ public class ActionServlet extends HttpServlet {
 			String jspFile = (String)info.method.invoke(action);
 			logger.debug("\n===================== "+ info.actionName + ActionInfo.METHOD_SPLITTER + info.methodName +"() end =====================");
 
-			jspFile = postAction(action, info, request, response, jspFile);
+			String fullJspFile = webAppConfig.jspPath+info.relativePath+"/"+jspFile;
+			fullJspFile = postAction(action, info, request, response, fullJspFile);
+			logger.debug(fullJspFile);
 
 			if(!response.isCommitted()){
-				getServletContext().getRequestDispatcher(webAppConfig.jspPath+info.relativePath+"/"+jspFile).forward(request, response);
+				getServletContext().getRequestDispatcher(fullJspFile).forward(request, response);
 			}
 		} catch (Exception e) {
 
