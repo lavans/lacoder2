@@ -17,7 +17,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 
-
 import org.apache.commons.lang3.time.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +40,7 @@ public class ActionServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	/** Action configuration. */
-	private WebAppConfig webAppConfig = BeanManager.getBean(WebAppConfig.class);
+	private final WebAppConfig webAppConfig = BeanManager.getBean(WebAppConfig.class);
 
 	/**
 	 * doPost.
@@ -410,7 +409,7 @@ public class ActionServlet extends HttpServlet {
 	 *
 	 */
 	protected class HttpRequestParamWrapper extends HttpServletRequestWrapper {
-		private Map<String, String[]> parameterMap;
+		private final Map<String, String[]> parameterMap;
 		public HttpRequestParamWrapper(HttpServletRequest request) {
 			super(request);
 			parameterMap = new HashMap<String, String[]>(request.getParameterMap());
