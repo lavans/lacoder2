@@ -150,10 +150,11 @@ public class DaoUtils {
 		}
 		String keys[] = key.split("\\.");
 		// memeberId -> MEMBER_ID
-		String field = StringUtils.toUnderscore(keys[0]);
-		String typeStr = StringUtils.toUnderscore(keys[1]).toUpperCase();
+		String field = StringUtils.toUnderscore(keys[keys.length-2]).toUpperCase();
+		String typeStr = StringUtils.toUnderscore(keys[keys.length-1]).toUpperCase();
 		ConditionTypeEnum type = ConditionTypeEnum.valueOf(ConditionTypeEnum.class, typeStr);
-		type.processCondition(key, field, builder, map);
+		String table = keys.length > 2 ?keys[keys.length-3]+".":"";
+		type.processCondition(key, table+field, builder, map);
 	}
 
 	/**
@@ -248,11 +249,11 @@ public class DaoUtils {
 	 * @param key
 	 * @return
 	 */
-	private static String getAttributeName(String key){
+	private static String getAttributeName(String key) {
 		// "."がある場合は属性名は"."より前の部分(ex memberId.equal
-		if(key.contains(".")){
-			String names[]=key.split("\\.");
-			return names[0];
+		if (key.contains(".")) {
+			String names[] = key.split("\\.");
+			return names[names.length - 2]; // 後ろから２つめ
 		}
 		return key;
 	}
@@ -279,6 +280,8 @@ public class DaoUtils {
 //			result.put(key, byte.valueOf(value));
 		}else if(clazz.equals(Date.class) || clazz.equals(java.sql.Date.class)){
 			result.put(key, DateUtils.getDate(value));
+		}else if(clazz.equals(Boolean.class) || clazz.equals(Boolean.TYPE)){
+			result.put(key, Boolean.valueOf(value));
 		}else{
 			// String
 			result.put(key, value);

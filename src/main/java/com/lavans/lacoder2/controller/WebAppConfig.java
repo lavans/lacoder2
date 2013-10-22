@@ -24,7 +24,7 @@ import com.lavans.lacoder2.util.Config;
 
 /**
  * Action config setting.
- * 
+ *
  * @author sbisec
  *
  */
@@ -47,7 +47,7 @@ public class WebAppConfig {
 
 	/** default extention */
 	private static String DEFAULT_EXTENSION="html";
-	
+
 	/** config xml */
 	private Config config = Config.getInstance();
 
@@ -62,12 +62,12 @@ public class WebAppConfig {
 	 * Return path to Action classes like "com.company.project.action"
 	 */
 	String actionPath;
-	
+
 	/**
 	 * Return path to jsp files like "/WEB-INF/jsp".
 	 */
 	String jspPath;
-	
+
 	String servicePath;
 	public String getServicePath(){
 		return servicePath;
@@ -99,6 +99,8 @@ public class WebAppConfig {
 		actionPath = getValue(CONFIG_ACTION_PATH,"");
 		jspPath = getValue(CONFIG_JSP_PATH,"");
 		servicePath = getValue(CONFIG_SERVICE_PATH,"");
+
+		if(jspPath.endsWith("/")) jspPath = jspPath.substring(0,jspPath.length()-1);
 		// if path has value, add "."
 //		if(!StringUtils.isEmpty(actionPath)){ actionPath += "."; }
 //		if(!StringUtils.isEmpty(jspPath)){ jspPath += "."; }
@@ -119,15 +121,15 @@ public class WebAppConfig {
 
 		// Action extension. Default: "html"
 		extenstions = getExtentions(config.getNodeValueList(CONFIG_EXTENSION));
-		
+
 		logger.info("extionsion:"+extenstions);
-		
+
 		logger.debug("=== web-app configuration end ===");
 	}
-	
+
 	/**
 	 * Get extention config.
-	 * 
+	 *
 	 * @param src
 	 * @return
 	 */
@@ -137,18 +139,18 @@ public class WebAppConfig {
 			String extensions[] = StringUtils.splitTrim(extensionStr, ",");
 			extentionSet.addAll(Arrays.asList(extensions));
 		}
-		
+
 		// if extension is not defined then use default.
 		if(extentionSet.isEmpty()){
 			extentionSet.add(DEFAULT_EXTENSION);
 		}
-		
+
 		return extentionSet;
 	}
-	
+
 	/**
 	 * Get value from config. If value is not set or empty, set defaultValue.
-	 * 
+	 *
 	 * @param key
 	 * @param defaultValue
 	 * @return
@@ -160,7 +162,7 @@ public class WebAppConfig {
 		}
 		return result;
 	}
-	
+
 	/**
 	 * Get specified class from lacoder.xml.
 	 *

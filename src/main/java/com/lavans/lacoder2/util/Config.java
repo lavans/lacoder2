@@ -144,7 +144,7 @@ public class Config {
 //			root = (Element)xpath.evaluate("/luz", new InputSource(fis), XPathConstants.NODE);
 
 			// debugの取得
-			isDebug = Boolean.parseBoolean(getNodeValue("debug"));
+			isDebug = getParameterBoolean("debug");
 		} catch (SAXException | IOException | ParserConfigurationException e) {
 			// どこでRuntimeに入れるか検討
 			logger.error("Can't parse xml file.["+ fileName +"]", e);
@@ -422,6 +422,15 @@ public class Config {
 			return defaultValue;
 		}
 		return value;
+	}
+
+	/**
+	 * パラメータ設定値をbooleanで返します。
+	 * @param name
+	 * @return
+	 */
+	public boolean getParameterBoolean(String name){
+		return Boolean.parseBoolean(getParameter(name));
 	}
 
 	/**

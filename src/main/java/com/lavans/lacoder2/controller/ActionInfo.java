@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import com.lavans.lacoder2.controller.impl.DefaultAction;
 import com.lavans.lacoder2.di.BeanManager;
+import com.lavans.lacoder2.lang.StringUtils;
 
 public class ActionInfo {
 	/** logger */
@@ -22,7 +23,7 @@ public class ActionInfo {
 	private static final WebAppConfig actionConfig = BeanManager.getBean(WebAppConfig.class);
 
 	private static final Map<String, ActionInfo> cache = new ConcurrentHashMap<>();
-	
+
 	/**
 	 * アクションへのパスからアクションクラスを作成。
 	 * パスにはsuffix(.do)は含まれていない
@@ -41,7 +42,7 @@ public class ActionInfo {
 		if(info!=null){
 			return info;
 		}
-		
+
 		// create
 		info = new ActionInfo();
 		setPath(info, actionURI);
@@ -56,7 +57,7 @@ public class ActionInfo {
 		cache.put(actionURI, info);
 		return info;
 	}
-	
+
 	/**
 	 * Path作成
 	 * @param info
@@ -68,7 +69,7 @@ public class ActionInfo {
 		// path="com.company.project.presentation.admin.action.main";
 		info.path = actionConfig.actionPath + info.relativePath.replace("/",".");
 	}
-	
+
 	/**
 	 * 名前情報を作成します。
 	 * @param actionURI
@@ -88,7 +89,13 @@ public class ActionInfo {
 			info.actionName = lastPath;
 			info.methodName = DEFAULT_METHOD;
 		}
+		// prefix "Action"
 		info.actionName +="Action";
+
+		// classname is always start with upper case.
+		if(Character.isLowerCase(info.actionName.charAt(0))){
+			info.actionName = StringUtils.capitalize(info.actionName);
+		}
 	}
 
 	/**
@@ -115,15 +122,15 @@ public class ActionInfo {
 		}
 		info.method = info.actionClass.getMethod(info.methodName);
 	}
-	
+
 	/**
 	 * set filters
-	 * @throws IllegalAccessException 
-	 * @throws InstantiationException 
-	 * @throws SecurityException 
-	 * @throws NoSuchMethodException 
-	 * @throws InvocationTargetException 
-	 * @throws IllegalArgumentException 
+	 * @throws IllegalAccessException
+	 * @throws InstantiationException
+	 * @throws SecurityException
+	 * @throws NoSuchMethodException
+	 * @throws InvocationTargetException
+	 * @throws IllegalArgumentException
 	 */
 	private static void setFilter(ActionInfo info, String actionURI) throws InstantiationException, IllegalAccessException, NoSuchMethodException, SecurityException, IllegalArgumentException, InvocationTargetException{
 		info.filterList = new ArrayList<>();
@@ -149,7 +156,7 @@ public class ActionInfo {
 		} catch (InstantiationException | IllegalAccessException e) {
 			throw new RuntimeException(e);
 		}
-		
+
 		return action;
 	}
 	public Class<?> getActionClass(){
@@ -161,7 +168,7 @@ public class ActionInfo {
 	public String getPath(){
 		return path;
 	}
-	
+
 	String actionName, methodName;
 	Class<?> actionClass;
 	Method method;

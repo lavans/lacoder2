@@ -23,7 +23,7 @@ public class PeriodUtilsTest {
 		str = PeriodUtils.prettyFormat(MINUTE);
 		logger.info(str);
 		assertEquals(str, "1m");
-		
+
 		str = PeriodUtils.prettyFormat(4*DAY+3*HOUR+2*MINUTE+1*SECOND);
 		logger.info(str);
 		assertEquals(str, "4d3h2m1s");
@@ -31,14 +31,17 @@ public class PeriodUtilsTest {
 		str = PeriodUtils.prettyFormat(1000*HOUR);
 		assertEquals(str, String.format("%dd%dh", 1000/24, 1000%24));
 		logger.info(str);
+
+		str = PeriodUtils.prettyFormat(123000);
+		logger.info(str);
 	}
-	
+
 	@Test
 	public void prettyParse正常(){
 		long actual = PeriodUtils.prettyParse("10m10s");
 		long expected = 10*MINUTE+10*SECOND;
 		assertEquals(actual, expected);
-		
+
 		actual = PeriodUtils.prettyParse("3d2h1m99s");
 		expected = 3*DAY+ 2*HOUR + 1*MINUTE + 99*SECOND;
 		assertEquals(actual, expected);

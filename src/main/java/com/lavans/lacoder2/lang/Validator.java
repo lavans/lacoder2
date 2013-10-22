@@ -58,7 +58,7 @@ public class Validator {
 	 * @return
 	 */
 	public static boolean isValidMailMobile(String item){
-		if(isValidMail(item)){
+		if(!isValidMail(item)){
 			return false;
 		}
 		for(String domain: domainList){
