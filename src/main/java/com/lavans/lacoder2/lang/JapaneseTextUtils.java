@@ -29,13 +29,12 @@ public class JapaneseTextUtils {
 	 * 英数字（一部記号）チェック
 	 *
 	 */
-	private static final String HANKANA = "アイウエオァィゥェォカキクケコサシスセソタチツッテトナニヌネノハヒフヘホマミムメモヤユヨャュョラリルレロワヲンー゛゜、。"; //
-	private static final String KATAKANA = "アイウエオァィゥェォカキクケコサシスセソタチツッテトナニヌネノハヒフヘホマミムメモヤユヨャュョラリルレロワヲンー\u309b\u309c、。"; // linuxで編集するためunicode表記にする ゜"
-
-	private static final String KATAKANA_D = "ヴガギグゲゴザジズゼゾダヂヅデドバビブベボ";
-	private static final String HANKANA_D = "ウカキクケコサシスセソタチツテトハヒフヘホ";
-	private static final String KATAKANA_H = "パピプペポ";
-	private static final String HANKANA_H = "ハヒフヘホ";
+    private static final String HANKANA = "ｱｲｳｴｵｧｨｩｪｫｶｷｸｹｺｻｼｽｾｿﾀﾁﾂｯﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖｬｭｮﾗﾘﾙﾚﾛﾜｦﾝｰﾞﾟ､｡｢｣･";
+    private static final String KATAKANA = "アイウエオァィゥェォカキクケコサシスセソタチツッテトナニヌネノハヒフヘホマミムメモヤユヨャュョラリルレロワヲンー\u309b\u309c、。「」・";
+    private static final String KATAKANA_D = "ヴガギグゲゴザジズゼゾダヂヅデドバビブベボ";
+    private static final String HANKANA_D = "ｳｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾊﾋﾌﾍﾎ";
+    private static final String KATAKANA_H = "パピプペポ";
+    private static final String HANKANA_H = "ﾊﾋﾌﾍﾎ";
 
 	/**
 	 * 全角カタカナを半角カタカナに変換。句読点あり。
