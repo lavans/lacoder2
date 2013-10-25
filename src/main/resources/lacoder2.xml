@@ -13,4 +13,15 @@
 
 
 	<parameter name="debug" value="true"/>
+
+
+		<database statistics="true">
+		<connection name="default">
+			<driver>org.postgresql.Driver</driver>
+			<url>jdbc:postgresql://localhost/ds</url>
+			<user>ds</user>
+			<pass>pass2ds</pass>
+			<logging>true</logging>
+		</connection>
+	</database>
 </root>

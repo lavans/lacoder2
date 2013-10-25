@@ -30,7 +30,7 @@ public class JapaneseTextUtils {
 	 *
 	 */
     private static final String HANKANA = "ｱｲｳｴｵｧｨｩｪｫｶｷｸｹｺｻｼｽｾｿﾀﾁﾂｯﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖｬｭｮﾗﾘﾙﾚﾛﾜｦﾝｰﾞﾟ､｡｢｣･";
-    private static final String KATAKANA = "アイウエオァィゥェォカキクケコサシスセソタチツッテトナニヌネノハヒフヘホマミムメモヤユヨャュョラリルレロワヲンー\u309b\u309c、。「」・";
+    private static final String KATAKANA = "アイウエオァィゥェォカキクケコサシスセソタチツッテトナニヌネノハヒフヘホマミムメモヤユヨャュョラリルレロワヲンー\u309b\u309c、。「」・"; // linuxで編集するためunicode表記にする ゜"
     private static final String KATAKANA_D = "ヴガギグゲゴザジズゼゾダヂヅデドバビブベボ";
     private static final String HANKANA_D = "ｳｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾊﾋﾌﾍﾎ";
     private static final String KATAKANA_H = "パピプペポ";
@@ -47,9 +47,9 @@ public class JapaneseTextUtils {
 			if ((index = KATAKANA.indexOf(kana)) >= 0) {
 				hankanaStr.append(HANKANA.charAt(index));
 			} else if ((index = KATAKANA_D.indexOf(kana)) >= 0) {
-				hankanaStr.append(HANKANA_D.charAt(index) + "゛");
+				hankanaStr.append(HANKANA_D.charAt(index) + "ﾞ");
 			} else if ((index = KATAKANA_H.indexOf(kana)) >= 0) {
-				hankanaStr.append(HANKANA_H.charAt(index) + "゜");
+				hankanaStr.append(HANKANA_H.charAt(index) + "ﾟ");
 			} else {
 				hankanaStr.append(kana);
 			}
