@@ -150,9 +150,6 @@ public class ActionSupport {
 	/*
 	 * @return
 	 */
-	protected boolean hasErrors(){
-		return actionErrors.size()>0 || fieldErrors.size()>0;
-	}
 	protected boolean hasActionErrors(){
 		return actionErrors.size()>0;
 	}
