@@ -39,11 +39,11 @@ public class ActionSupport {
 	private HttpServletResponse response;
 
 	/** action error messages */
-	private List<String> actionErrors = new ArrayList<String>();
+	private final List<String> actionErrors = new ArrayList<String>();
 	/** field error messages.  */
-	private Map<String, String> fieldErrors = new HashMap<String, String>();
+	private final Map<String, String> fieldErrors = new HashMap<String, String>();
 	/** action messages */
-	private List<String> actionMessages = new ArrayList<String>();
+	private final List<String> actionMessages = new ArrayList<String>();
 
 	private String chainAction = null;
 	public String getChainAction() {
@@ -141,6 +141,9 @@ public class ActionSupport {
 	public List<String> getActionErrors(){
 		return actionErrors;
 	}
+	protected boolean hasActionErrors(){
+		return actionErrors.size()>0;
+	}
 
 	/**
 	 * Add Field Error.
@@ -152,6 +155,13 @@ public class ActionSupport {
 	}
 	public Map<String, String> getFieldErrors(){
 		return fieldErrors;
+	}
+	protected boolean hasFieldErrors(){
+		return fieldErrors.size()>0;
+	}
+
+	protected boolean hasErrors(){
+		return hasActionErrors() || hasFieldErrors();
 	}
 
 	/**
