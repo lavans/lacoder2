@@ -102,8 +102,9 @@ public class RemoteServlet extends HttpServlet {
 		try{
 			byte data[] = invoker.invoke(pathInfo, ClassUtils.toClass(args), args);
 			// Write response
+			response.setCharacterEncoding("UTF-8");
 			WriteUtils writeUtils = BeanManager.getBean(WriteUtils.class);
-			writeUtils.writeBytes(response, data);
+			writeUtils.writeBytes(response, "application/octet-stream", data);
 		}catch(Throwable e){
 			logger.error(pathInfo, e);
 		}

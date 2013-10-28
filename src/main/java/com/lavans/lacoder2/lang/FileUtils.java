@@ -6,6 +6,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Collection;
 
+
 public class FileUtils{
 	/**
 	 * 設定保存。
