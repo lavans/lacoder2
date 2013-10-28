@@ -70,6 +70,7 @@ public class ServiceManager { // implements ServiceManager{
 		};
 //		Class<? extends Object> clazz = BeanManager.getBeanClass(id);
 		service = createService(clazz, new RemoteInterceptor(serverGroup));
+		logger.debug(clazz.getSimpleName()+"[Remote] create.");
 		serviceMap.put(id, service);
 //		logger.debug("Add Service "+ id);
 		return (T)service;
@@ -104,6 +105,7 @@ public class ServiceManager { // implements ServiceManager{
 		Class<? extends Object> clazz = BeanManager.getBeanClass(id);
 
 		service = createService(clazz, new TransactionInterceptor());
+		logger.debug(clazz.getSimpleName()+"[Local] create.");
 		serviceLocalMap.put(id, service);
 
 		return (T)service;
@@ -116,7 +118,6 @@ public class ServiceManager { // implements ServiceManager{
 	 * @return
 	 */
 	private static Object createService(Class<? extends Object> clazz, Callback callback){
-		logger.debug(clazz.getSimpleName()+" create.");
 		// intercept by CGLIB
 		Enhancer enhancer = new Enhancer();
 		enhancer.setSuperclass(clazz);
