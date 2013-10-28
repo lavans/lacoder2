@@ -142,6 +142,13 @@ public class ActionSupport {
 		return actionErrors;
 	}
 
+	/*
+	 * @return
+	 */
+	protected boolean hasErrors(){
+		return actionErrors.size()>0 || fieldErrors.size()>0;
+	}
+	
 	/**
 	 * Add Field Error.
 	 * @param key
