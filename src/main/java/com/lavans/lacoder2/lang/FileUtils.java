@@ -41,22 +41,22 @@ public class FileUtils{
 
 		return result;
 	}
-	
+
 	/**
 	 * クラス名とメソッド名と拡張子からファイル名を作成する。
 	 * クラスと同じディレクトリ上にある設定ファイル名作成する。
 	 * フォーマットは"path/to/dir/classname-additional.extention"。
 	 * 追加文字列を省略したときは"<クラス名>.<拡張子>"。
 	 * 拡張子を省略したときは"<クラス名>.xml"。
-	 * 
+	 *
 	 * 例)
 	 * makeFileName(this)
-	 *  ... "jp/co/sbisec/iris/common/di/ServiceManagerTest.xml
+	 *  ... "com/lavans/lacoder2/di/ServiceManagerTest.xml
 	 * makeFileName(this, "local")
-	 *  ... "jp/co/sbisec/iris/common/di/ServiceManagerTest-local.xml
+	 *  ... "com/lavans/lacoder2/di/ServiceManagerTest-local.xml
 	 * makeFileName(this, "remote","json")
-	 *  ... "jp/co/sbisec/iris/common/di/ServiceManagerTest-remote.json
-	 * 
+	 *  ... "com/lavans/lacoder2/di/ServiceManagerTest-remote.json
+	 *
 	 * @param clazz
 	 * @param method
 	 * @param extension

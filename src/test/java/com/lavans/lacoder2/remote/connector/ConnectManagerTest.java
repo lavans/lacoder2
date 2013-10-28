@@ -1,6 +1,4 @@
 package com.lavans.lacoder2.remote.connector;
-//package jp.co.sbisec.iris.common.remote.connector;
-//
 //import static org.testng.Assert.assertEquals;
 //import static org.testng.Assert.assertFalse;
 //import static org.testng.Assert.assertTrue;

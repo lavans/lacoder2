@@ -1,13 +1,11 @@
 package com.lavans.lacoder2.remote.servlet;
 
-import static org.testng.Assert.assertTrue;
 import net.arnx.jsonic.JSON;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.Test;
 
-import com.lavans.lacoder2.remote.servlet.RemoteInvoker;
 import com.lavans.lacoder2.remote.servlet.mock.dto.MockExecIn;
 
 public class RemoteInvokerTest {
@@ -48,7 +46,7 @@ public class RemoteInvokerTest {
 
 }
 // {
-//   "service":"jp.co.sbisec.iris.news.service.NewsService",
+//   "service":"com.lavans.service.NewsService",
 //   "method":"list",
 //   "in":{
 //     "newsGroupId":"1"
