@@ -122,14 +122,12 @@ public class WriteUtils {
 	}
 
 	/**
-	 * Write Json data to response with "application/json" and "UTF-8".
+	 * Write byte data to response with contentType.
 	 * @param response
 	 * @param data
 	 */
-	public void writeBytes(HttpServletResponse response, byte data[]){
-		// application/json or  text/javascript
-		response.setContentType("application/octet-stream");
-		response.setCharacterEncoding("UTF-8");
+	public void writeBytes(HttpServletResponse response, String contentType, byte data[]){
+		response.setContentType(contentType);
 
 		try(OutputStream out = response.getOutputStream()) {
 			out.write(data);

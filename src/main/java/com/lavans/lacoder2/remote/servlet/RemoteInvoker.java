@@ -142,7 +142,7 @@ public class RemoteInvoker {
 		 * @return
 		 */
 		private static String toServiceName(String url, Converter converter){
-			// iris-common managerクラスの場合はfqdn固定
+			// lacoder2 managerクラスの場合はfqdn固定
 			String serviceName = url.replace("/", ".");
 			if(serviceName.startsWith(".com.lavans.lacoder2.manager")){
 				return serviceName.substring(1);

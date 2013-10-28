@@ -79,10 +79,10 @@ public class SimpleHttpClientTest {
 
 //	@Test
 	public void URLエンコードなしでget() {
-		String str = SimpleHttpClient.get("http://localhost:8080/iris-manager/as/cache/Cache.html?a=%&b=あああ");
+		String str = SimpleHttpClient.get("http://localhost:8080/ds-manager/as/cache/Cache.html?a=%&b=あああ");
 		logger.info(str);
 	}
-	
+
 	@Mocked
 	HttpURLConnection con;
 //	@Test
@@ -92,7 +92,7 @@ public class SimpleHttpClientTest {
 //		postData.put("b","あああ\nいいい\nううう");
 //		postData.put("c","あああ\nいいい\nううう");
 		String postData = "a=あああ\nいいい\nううう&b=あああ\nいいい\nううう";
-		String str = SimpleHttpClient.post("http://localhost:8080/iris-manager/as/cache/Cache.html?a=%&b=あああ", postData);
+		String str = SimpleHttpClient.post("http://localhost:8080/ds-manager/as/cache/Cache.html?a=%&b=あああ", postData);
 		logger.info(str);
 	}
 }

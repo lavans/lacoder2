@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -127,6 +128,10 @@ public class ActionSupport {
 	public String[] getParameterValues(String key){
 		return request.getParameterValues(key);
 	}
+
+	protected ServletContext getServletContext(){
+		return request.getServletContext();
+	}
 	/**
 	 * Add Action Error.
 	 * @param key
@@ -140,6 +145,13 @@ public class ActionSupport {
 	}
 	public List<String> getActionErrors(){
 		return actionErrors;
+	}
+
+	/*
+	 * @return
+	 */
+	protected boolean hasErrors(){
+		return actionErrors.size()>0 || fieldErrors.size()>0;
 	}
 	protected boolean hasActionErrors(){
 		return actionErrors.size()>0;
@@ -256,6 +268,18 @@ public class ActionSupport {
 	protected String xml(Document document){
 		WriteUtils writeUtils = BeanManager.getBean(WriteUtils.class);
 		writeUtils.writeXml(getResponse(), document);
+
+		return NO_JSP;
+	}
+
+	/**
+	 * binay出力
+	 * @param document
+	 * @return
+	 */
+	protected String binary(String contentType, byte[] data){
+		WriteUtils writeUtils = BeanManager.getBean(WriteUtils.class);
+		writeUtils.writeBytes(getResponse(), contentType,  data);
 
 		return NO_JSP;
 	}
