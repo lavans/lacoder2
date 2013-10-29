@@ -20,15 +20,18 @@ public class RemoteInterceptor implements MethodInterceptor{
 	/** Logger */
 	private static Logger logger = LogUtils.getLogger();
 	/** ConnectManager */
-	private ConnectManager connectManager = BeanManager.getBean(ConnectManager.class);
+	private final ConnectManager connectManager = BeanManager.getBean(ConnectManager.class);
 
-	private ServerGroup serverGroup;
+	private final ServerGroup serverGroup;
 	public RemoteInterceptor(ServerGroup serverGroup){
 		this.serverGroup = serverGroup;
 	}
 
 	@Override
 	public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable {
+		if(method.getName().equals("toString")){
+			return obj.getClass().getSimpleName()+"$Remote";
+		}
 		if(isLocalOnly(method)){
 			return method.invoke(obj, args);
 		}
