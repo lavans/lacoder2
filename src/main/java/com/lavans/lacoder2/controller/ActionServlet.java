@@ -18,6 +18,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 
+import lombok.val;
+
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.fileupload.FileUploadException;
@@ -65,7 +67,56 @@ public class ActionServlet extends HttpServlet {
 	@Override
 	protected void doPost(HttpServletRequest requestOrg, HttpServletResponse response)
 	throws ServletException, IOException {
-		BufferedReader br = new BufferedReader(new InputStreamReader(requestOrg.getInputStream(),"ISO-8859-1"));
+		HttpRequestParamWrapper request=null;
+		if(ServletFileUpload.isMultipartContent(requestOrg)){
+			request = createMultipartRequest(requestOrg);
+		}else{
+			String query = getQuery(requestOrg);
+			// wrap for
+			request= new HttpRequestParamWrapper(requestOrg);
+
+			// ParameterMap contains prev GET query string, when <form action=""> is empty.
+			// remove them all.
+			request.parameterMap.clear();
+			// put this time POST string.
+			request.parameterMap.putAll(ParameterUtils.toMap(query, webAppConfig.encoding));
+		}
+
+		doService(request, response);
+	}
+
+	/**
+	 * Return HttpRequestWrappter with multipart data.
+	 *
+	 * @param request
+	 * @return
+	 */
+	private HttpRequestParamWrapper createMultipartRequest(HttpServletRequest request){
+		val result = new HttpRequestParamWrapper(request);
+
+		// アップロードオブジェクトの作成
+		FileItemFactory factory = new DiskFileItemFactory();
+		ServletFileUpload upload = new ServletFileUpload(factory);
+		//upload.setSizeMax(photoSize*1000);
+		upload.setSizeMax(webAppConfig.uploadFileSizeMax);
+		try {
+			result.multipartMap=upload.parseParameterMap(request);
+		} catch (FileUploadException e) {
+			throw new RuntimeException(e);
+		}
+		return result;
+	}
+
+
+	/**
+	 * Make Query String.
+	 * @param request
+	 * @return
+	 * @throws UnsupportedEncodingException
+	 * @throws IOException
+	 */
+	private String getQuery(HttpServletRequest request) throws UnsupportedEncodingException, IOException{
+		BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream(),"ISO-8859-1"));
 		String query="";
 
 		try {
@@ -78,19 +129,8 @@ public class ActionServlet extends HttpServlet {
 		}catch (IOException e){
 			throw new RuntimeException(e);
 		}
-
-		// wrap for
-		HttpRequestParamWrapper request= new HttpRequestParamWrapper(requestOrg);
-
-		// ParameterMap contains prev GET query string, when <form action=""> is empty.
-		// remove them all.
-		request.parameterMap.clear();
-		// put this time POST string.
-		request.parameterMap.putAll(ParameterUtils.toMap(query, webAppConfig.encoding));
-
-		doService(request, response);
+		return query;
 	}
-
 	/**
 	 * doGet.
 	 * for HttpRequestParamWrapper, GET strings are also decoded.
@@ -420,11 +460,7 @@ public class ActionServlet extends HttpServlet {
 		private Map<String, List<FileItem>> multipartMap;
 		public HttpRequestParamWrapper(HttpServletRequest request) {
 			super(request);
-			if(ServletFileUpload.isMultipartContent(request)){
-				multipartMap = getMultipart(request);
-			}else{
-				parameterMap = new HashMap<String, String[]>(request.getParameterMap());
-			}
+			parameterMap = new HashMap<String, String[]>(request.getParameterMap());
 		}
 
 		@Override
@@ -470,19 +506,6 @@ public class ActionServlet extends HttpServlet {
 		@Override
 		public String[] getParameterValues(String name) {
 			return parameterMap.get(name);
-		}
-
-		private Map<String,List<FileItem>> getMultipart(HttpServletRequest request){
-			// アップロードオブジェクトの作成
-			FileItemFactory factory = new DiskFileItemFactory();
-			ServletFileUpload upload = new ServletFileUpload(factory);
-			//upload.setSizeMax(photoSize*1000);
-			upload.setSizeMax(webAppConfig.uploadFileSizeMax);
-			try {
-				return upload.parseParameterMap(request);
-			} catch (FileUploadException e) {
-				throw new RuntimeException(e);
-			}
 		}
 	}
 }
