@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import net.arnx.jsonic.JSON;
 
+import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Document;
 
@@ -45,6 +46,8 @@ public class ActionSupport {
 	private final Map<String, String> fieldErrors = new HashMap<String, String>();
 	/** action messages */
 	private final List<String> actionMessages = new ArrayList<String>();
+
+	private Map<String, List<FileItem>> multipartMap = new HashMap<>();
 
 	private String chainAction = null;
 	public String getChainAction() {
@@ -132,6 +135,24 @@ public class ActionSupport {
 	protected ServletContext getServletContext(){
 		return request.getServletContext();
 	}
+
+
+	public void setMultipartMap(Map<String, List<FileItem>> map){
+		this.multipartMap = map;
+	}
+	public Map<String, List<FileItem>> getMultipartMap(){
+		return multipartMap;
+	}
+	/**
+	 * Multipart file item.
+	 * If some items exist in same key, return first one.
+	 *
+	 * @reutrn fileItem
+	 */
+	protected FileItem getMultipartItem(String key){
+		return multipartMap.get(key).get(0);
+	}
+
 	/**
 	 * Add Action Error.
 	 * @param key

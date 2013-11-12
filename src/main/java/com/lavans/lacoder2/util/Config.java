@@ -313,6 +313,9 @@ public class Config {
 	public int getNodeValueInt(String key, int defaultValue){
 		return (int)getValueDefault(getNodeValue(key), defaultValue);
 	}
+	public long getNodeValueLong(String key, long defaultValue){
+		return getValueDefault(getNodeValue(key), defaultValue);
+	}
 
 //	public Object getNode(String xql,Object item, QName returnType) throws XPathExpressionException{
 //		Object result;

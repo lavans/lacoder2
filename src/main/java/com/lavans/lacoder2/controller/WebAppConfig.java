@@ -41,6 +41,8 @@ public class WebAppConfig {
 	private static final String CONFIG_FILTER		=CONFIG_SECTION+"filter";
 	private static final String CONFIG_LOGGER		=CONFIG_SECTION+"logger";
 	private static final String CONFIG_EXCEPTION_HANDLER	=CONFIG_SECTION+"exception-handler";
+	private static final String CONFIG_UPLOAD_FILESIZE		=CONFIG_SECTION+"upload-filesize";
+	private static final long DEFULAT_UPLOAD_FILESIZE = 1024*1024*10; // 10MB
 
 	/** Default charset */
 	private static String DEFAULT_ENCODING="UTF-8";
@@ -87,6 +89,9 @@ public class WebAppConfig {
 	/** exception-handler */
 	ExceptionHandler exceptionHandler;
 
+	/** Upload file size. */
+	long uploadFileSizeMax;
+
 	private WebAppConfig(){
 		init();
 	}
@@ -121,6 +126,8 @@ public class WebAppConfig {
 
 		// Action extension. Default: "html"
 		extenstions = getExtentions(config.getNodeValueList(CONFIG_EXTENSION));
+
+		uploadFileSizeMax = config.getNodeValueLong(CONFIG_UPLOAD_FILESIZE, DEFULAT_UPLOAD_FILESIZE);
 
 		logger.info("extionsion:"+extenstions);
 

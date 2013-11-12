@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletException;
@@ -17,6 +18,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileItemFactory;
+import org.apache.commons.fileupload.FileUploadException;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.lang3.time.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -341,13 +347,14 @@ public class ActionServlet extends HttpServlet {
 	 * @param response
 	 * @throws Exception
 	 */
-	private void setContext(Object action, HttpServletRequest request, HttpServletResponse response) throws Exception{
+	private void setContext(Object action, HttpRequestParamWrapper request, HttpServletResponse response) throws Exception{
 		// Set request & response.
 		ActionSupport actionSupport = null;
 		if(action instanceof ActionSupport){
 			actionSupport = (ActionSupport)action;
 			actionSupport.setRequest(request);
 			actionSupport.setResponse(response);
+			actionSupport.setMultipartMap(request.multipartMap);
 		}
 	}
 
@@ -409,10 +416,15 @@ public class ActionServlet extends HttpServlet {
 	 *
 	 */
 	protected class HttpRequestParamWrapper extends HttpServletRequestWrapper {
-		private final Map<String, String[]> parameterMap;
+		private Map<String, String[]> parameterMap;
+		private Map<String, List<FileItem>> multipartMap;
 		public HttpRequestParamWrapper(HttpServletRequest request) {
 			super(request);
-			parameterMap = new HashMap<String, String[]>(request.getParameterMap());
+			if(ServletFileUpload.isMultipartContent(request)){
+				multipartMap = getMultipart(request);
+			}else{
+				parameterMap = new HashMap<String, String[]>(request.getParameterMap());
+			}
 		}
 
 		@Override
@@ -458,6 +470,19 @@ public class ActionServlet extends HttpServlet {
 		@Override
 		public String[] getParameterValues(String name) {
 			return parameterMap.get(name);
+		}
+
+		private Map<String,List<FileItem>> getMultipart(HttpServletRequest request){
+			// アップロードオブジェクトの作成
+			FileItemFactory factory = new DiskFileItemFactory();
+			ServletFileUpload upload = new ServletFileUpload(factory);
+			//upload.setSizeMax(photoSize*1000);
+			upload.setSizeMax(webAppConfig.uploadFileSizeMax);
+			try {
+				return upload.parseParameterMap(request);
+			} catch (FileUploadException e) {
+				throw new RuntimeException(e);
+			}
 		}
 	}
 }
