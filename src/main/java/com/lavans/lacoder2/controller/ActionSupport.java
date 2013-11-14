@@ -131,6 +131,9 @@ public class ActionSupport {
 	public String[] getParameterValues(String key){
 		return request.getParameterValues(key);
 	}
+	public Map<String, String[]> getParameterMap(){
+		return request.getParameterMap();
+	}
 
 	protected ServletContext getServletContext(){
 		return request.getServletContext();
