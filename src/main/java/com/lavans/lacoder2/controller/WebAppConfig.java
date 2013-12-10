@@ -115,7 +115,7 @@ public class WebAppConfig {
 		for(String filterName: filterNames){
 			Class<? extends ActionFilter> filter = BeanManager.getBeanClass(filterName);
 			allFilterList.add(filter);
-			logger.info("allFilter:"+filter.getClass().getName());
+			logger.info("allFilter:"+filter.getName());
 		}
 
 		// specified classes
