@@ -3,7 +3,7 @@ package com.lavans.lacoder2.di;
 import java.io.FileNotFoundException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
+import java.util.concurrent.ExecutionException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,6 +11,9 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.lavans.lacoder2.lang.StringUtils;
 import com.lavans.lacoder2.util.Config;
 
@@ -27,7 +30,7 @@ public class BeanManager {
 	/**  */
 	private static Map<String, String> packageNameMap = new ConcurrentHashMap<String, String>();
 	/** cache of all service */
-	private static Map<String, BeanInfo> beanMap = new ConcurrentHashMap<String, BeanInfo>();
+	private static LoadingCache<String, BeanInfo> beanMap = createCache();
 
 	private BeanManager() {
 	}
@@ -45,13 +48,30 @@ public class BeanManager {
 	}
 
 	/**
+	 * キャッシュインスタンス作成。
+	 * @return
+	 */
+	private static LoadingCache<String,  BeanInfo> createCache(){
+		return CacheBuilder.newBuilder().
+			build(new CacheLoader<String,  BeanInfo>(){
+				@Override
+				public BeanInfo load(String key) throws Exception {
+					// Get FQDN bean info
+					BeanInfo beanInfo = new BeanInfo();
+					beanInfo.id = beanInfo.className = key;
+					return beanInfo;
+				}
+			});
+	}
+
+	/**
 	 * Init bean & group info.
 	 *
 	 * @throws FileNotFoundException
 	 */
 	public static void init() {
 		packageNameMap.clear();
-		beanMap.clear();
+		beanMap.invalidateAll();
 		logger.info("Clear bean mapping information.");
 	}
 
@@ -206,15 +226,11 @@ public class BeanManager {
 	}
 
 	private static BeanInfo getBeanInfo(String id) {
-		// Get FQDN bean info
-		BeanInfo bean = beanMap.get(id);
-		if (bean == null) {
-			// if id is not defined in config file then id is className
-			bean = new BeanInfo();
-			bean.id = bean.className = id;
-			beanMap.put(id, bean);
+		try {
+			return beanMap.get(id);
+		} catch (ExecutionException e) {
+			throw new RuntimeException(e);
 		}
-		return bean;
 	}
 
 	/**
