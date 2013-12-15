@@ -19,14 +19,10 @@ public class ErrorUtils {
     	StringBuffer buffer = new StringBuffer(4096);
 
 		// リクエスト情報を付加
-		buffer.append("\t");
-		buffer.append(request.getSession().getId()).append("\t");
-		buffer.append(request.getRequestURI()).append("\t");
-		buffer.append(request.getRemoteAddr()).append("\n");
-		buffer.append("user-agent    :[").append(request.getHeader("user-agent")).append("]\n");
-		buffer.append("method        :[").append(request.getMethod()).append("]\n");
-		buffer.append("content type  :[").append(request.getContentType()).append("]\n");
-		buffer.append("content length:[").append(request.getContentLength()).append("]\n");
+		buffer.append("\n");
+		buffer.append(request.getMethod() + " "+ request.getRequestURI()).append("\t");
+		buffer.append(request.getRemoteAddr()).append("\t");
+		buffer.append(request.getSession().getId()).append("\n");
 		buffer.append(getRequestHeadersString(request)).append("\n");
 		buffer.append(getRequestParameterString(request)).append("\n");
 		buffer.append(getRequestAttributeString(request)).append("\n");
