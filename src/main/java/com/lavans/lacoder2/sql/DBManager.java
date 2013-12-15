@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
@@ -35,7 +34,7 @@ public class DBManager{
 	private static Logger logger = LoggerFactory.getLogger(DBManager.class);
 
 	public static final String DEFAULT_DATABASE = "default";
-	
+
 	/**
 	 * 設定ファイルのセクション名。
 	 */
@@ -331,5 +330,19 @@ public class DBManager{
 				pool.commit();
 			}
 		}
+	}
+
+	/**
+	 * 物理切断。
+	 * すべてのコネクションプールを対象とする。
+	 *
+	 * @return
+	 */
+	public static int physicalClose() throws SQLException{
+		int result=0;
+		for(ConnectionPool pool: dbMap.values()){
+			result += pool.physicalClose();
+		}
+		return result;
 	}
 }

@@ -20,10 +20,13 @@ import java.sql.Statement;
 import java.sql.Struct;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.Executor;
+
+import lombok.Getter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,6 +53,14 @@ import com.lavans.lacoder2.sql.bind.BindPreparedStatement;
 public class PooledConnection implements BindConnection {
 	/** ロガー。debug用 */
 	private static Logger logger = LoggerFactory.getLogger(PooledConnection.class);
+
+	private BindConnection con=null;
+	private ConnectionPool pool = null;
+
+	/** close()時にすべてのStatementを自動的に閉じる。 */
+	private final List<PooledStatement> statementList = Collections.synchronizedList(new ArrayList<PooledStatement>());
+
+	@Getter private Date lastAccessTime;
 
 	@Override
 	public String toString(){
@@ -108,13 +119,6 @@ public class PooledConnection implements BindConnection {
 		return con.getNetworkTimeout();
 	}
 
-	private BindConnection con=null;
-	private ConnectionPool pool = null;
-
-	/** close()時にすべてのStatementを自動的に閉じる。 */
-	private final List<PooledStatement> statementList = Collections.synchronizedList(new ArrayList<PooledStatement>());
-
-
 	public BindConnection getRealConnection(){
 		return con;
 	}
@@ -172,6 +176,7 @@ public class PooledConnection implements BindConnection {
 	 */
 	@Override
 	public void close() throws SQLException{
+		lastAccessTime = new Date();
 		pool.releaseConnection(this);
 //		DBManager.releaseConnection(this,pool);
 		// DBManager#releaseConnection()->ConnectionPool#releaseConnection()の中で

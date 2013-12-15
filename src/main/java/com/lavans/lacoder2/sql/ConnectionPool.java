@@ -494,10 +494,26 @@ public class ConnectionPool{
 	 * @throws SQLException
 	 */
 	public int physicalClose() throws SQLException{
+		int result=physicalClose(poolList);
+		result += physicalClose(useList);
+		return result;
+	}
+
+	/**
+	 * Close physical connections.
+	 *
+	 * @param list
+	 * @return
+	 * @throws SQLException
+	 */
+	private int physicalClose(List<PooledConnection> list) throws SQLException{
 		int result=0;
-		for(PooledConnection con: useList){
-			con.close();
-			result++;
+		synchronized (list) {
+			for(PooledConnection con: list){
+				con.close();
+				result++;
+			}
+			list.clear();
 		}
 		return result;
 	}
