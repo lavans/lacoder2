@@ -25,7 +25,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.Executor;
 
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,6 +61,7 @@ public class PooledConnection implements BindConnection {
 	 * @throws SQLException
 	 * @see java.sql.Connection#setSchema(java.lang.String)
 	 */
+	@Override
 	public void setSchema(String schema) throws SQLException {
 		con.setSchema(schema);
 	}
@@ -71,6 +71,7 @@ public class PooledConnection implements BindConnection {
 	 * @throws SQLException
 	 * @see java.sql.Connection#getSchema()
 	 */
+	@Override
 	public String getSchema() throws SQLException {
 		return con.getSchema();
 	}
@@ -80,6 +81,7 @@ public class PooledConnection implements BindConnection {
 	 * @throws SQLException
 	 * @see java.sql.Connection#abort(java.util.concurrent.Executor)
 	 */
+	@Override
 	public void abort(Executor executor) throws SQLException {
 		con.abort(executor);
 	}
@@ -90,6 +92,7 @@ public class PooledConnection implements BindConnection {
 	 * @throws SQLException
 	 * @see java.sql.Connection#setNetworkTimeout(java.util.concurrent.Executor, int)
 	 */
+	@Override
 	public void setNetworkTimeout(Executor executor, int milliseconds)
 			throws SQLException {
 		con.setNetworkTimeout(executor, milliseconds);
@@ -100,6 +103,7 @@ public class PooledConnection implements BindConnection {
 	 * @throws SQLException
 	 * @see java.sql.Connection#getNetworkTimeout()
 	 */
+	@Override
 	public int getNetworkTimeout() throws SQLException {
 		return con.getNetworkTimeout();
 	}
@@ -108,7 +112,7 @@ public class PooledConnection implements BindConnection {
 	private ConnectionPool pool = null;
 
 	/** close()時にすべてのStatementを自動的に閉じる。 */
-	private List<PooledStatement> statementList = Collections.synchronizedList(new ArrayList<PooledStatement>());
+	private final List<PooledStatement> statementList = Collections.synchronizedList(new ArrayList<PooledStatement>());
 
 
 	public BindConnection getRealConnection(){
@@ -141,6 +145,7 @@ public class PooledConnection implements BindConnection {
 	 * BindConnectionImpleに処理委譲。
 	 * @see com.lavans.lacoder2.sql.bind.impl.lavans.util.jdbc.bind.BindConnectionImpl#bindPrepareStatement(java.lang.String)
 	 */
+	@Override
 	public BindPreparedStatement bindPrepareStatement(String sql)
 			throws SQLException {
 		BindPreparedStatement bst = con.bindPrepareStatement(sql);
@@ -153,6 +158,7 @@ public class PooledConnection implements BindConnection {
 	 * BindConnectionImpleに処理委譲。
 	 * @see com.lavans.lacoder2.sql.bind.impl.lavans.util.jdbc.bind.BindConnectionImpl#bindPrepareStatement(java.lang.String)
 	 */
+	@Override
 	public BindCallableStatement bindPrepareCall(String sql)
 			throws SQLException {
 		BindCallableStatement bst = con.bindPrepareCall(sql);
@@ -164,12 +170,25 @@ public class PooledConnection implements BindConnection {
 	/**
 	 * DBManagerを通じてコネクションプールに返却。
 	 */
+	@Override
 	public void close() throws SQLException{
 		pool.releaseConnection(this);
 //		DBManager.releaseConnection(this,pool);
 		// DBManager#releaseConnection()->ConnectionPool#releaseConnection()の中で
 		// clearStatementList()を呼び出すのでここで呼ぶ必要はない。
 		// ConnectionPoolクラスでpoolListに移し終わっているので、呼んではいけない。
+	}
+
+	/**
+	 * Close physical connection.
+	 * Clear all statement and close real connection.
+	 *
+	 * @throws SQLException
+	 *
+	 */
+	public void physicalClose() throws SQLException{
+		clearStatementList();
+		con.close();
 	}
 
 	/**
@@ -198,12 +217,14 @@ public class PooledConnection implements BindConnection {
 	/**
 	 * @throws java.sql.SQLException
 	 */
+	@Override
 	public void clearWarnings() throws SQLException {
 		con.clearWarnings();
 	}
 	/**
 	 * @throws java.sql.SQLException
 	 */
+	@Override
 	public void commit() throws SQLException {
 		con.commit();
 	}
@@ -211,6 +232,7 @@ public class PooledConnection implements BindConnection {
 	 * @return
 	 * @throws java.sql.SQLException
 	 */
+	@Override
 	public Statement createStatement() throws SQLException {
 		Statement st = con.createStatement();
 		PooledStatement pst = new PooledStatement(this,st);
@@ -223,6 +245,7 @@ public class PooledConnection implements BindConnection {
 	 * @return
 	 * @throws java.sql.SQLException
 	 */
+	@Override
 	public Statement createStatement(int arg0, int arg1) throws SQLException {
 		Statement st = con.createStatement(arg0, arg1);
 		PooledStatement pst = new PooledStatement(this,st);
@@ -236,6 +259,7 @@ public class PooledConnection implements BindConnection {
 	 * @return
 	 * @throws java.sql.SQLException
 	 */
+	@Override
 	public Statement createStatement(int arg0, int arg1, int arg2)
 			throws SQLException {
 		Statement st = con.createStatement(arg0, arg1, arg2);
@@ -247,6 +271,7 @@ public class PooledConnection implements BindConnection {
 	 * @return
 	 * @throws java.sql.SQLException
 	 */
+	@Override
 	public boolean getAutoCommit() throws SQLException {
 		return con.getAutoCommit();
 	}
@@ -254,6 +279,7 @@ public class PooledConnection implements BindConnection {
 	 * @return
 	 * @throws java.sql.SQLException
 	 */
+	@Override
 	public String getCatalog() throws SQLException {
 		return con.getCatalog();
 	}
@@ -261,6 +287,7 @@ public class PooledConnection implements BindConnection {
 	 * @return
 	 * @throws java.sql.SQLException
 	 */
+	@Override
 	public int getHoldability() throws SQLException {
 		return con.getHoldability();
 	}
@@ -268,6 +295,7 @@ public class PooledConnection implements BindConnection {
 	 * @return
 	 * @throws java.sql.SQLException
 	 */
+	@Override
 	public DatabaseMetaData getMetaData() throws SQLException {
 		return con.getMetaData();
 	}
@@ -275,6 +303,7 @@ public class PooledConnection implements BindConnection {
 	 * @return
 	 * @throws java.sql.SQLException
 	 */
+	@Override
 	public int getTransactionIsolation() throws SQLException {
 		return con.getTransactionIsolation();
 	}
@@ -282,6 +311,7 @@ public class PooledConnection implements BindConnection {
 	 * @return
 	 * @throws java.sql.SQLException
 	 */
+	@Override
 	public Map<String, Class<?>> getTypeMap() throws SQLException {
 		return con.getTypeMap();
 	}
@@ -289,6 +319,7 @@ public class PooledConnection implements BindConnection {
 	 * @return
 	 * @throws java.sql.SQLException
 	 */
+	@Override
 	public SQLWarning getWarnings() throws SQLException {
 		return con.getWarnings();
 	}
@@ -297,6 +328,7 @@ public class PooledConnection implements BindConnection {
 	 * @return
 	 * @throws java.sql.SQLException
 	 */
+	@Override
 	public boolean isClosed() throws SQLException {
 		return con.isClosed();
 	}
@@ -304,6 +336,7 @@ public class PooledConnection implements BindConnection {
 	 * @return
 	 * @throws java.sql.SQLException
 	 */
+	@Override
 	public boolean isReadOnly() throws SQLException {
 		return con.isReadOnly();
 	}
@@ -312,6 +345,7 @@ public class PooledConnection implements BindConnection {
 	 * @return
 	 * @throws java.sql.SQLException
 	 */
+	@Override
 	public String nativeSQL(String arg0) throws SQLException {
 		return con.nativeSQL(arg0);
 	}
@@ -320,6 +354,7 @@ public class PooledConnection implements BindConnection {
 	 * @return
 	 * @throws java.sql.SQLException
 	 */
+	@Override
 	public CallableStatement prepareCall(String arg0) throws SQLException {
 		CallableStatement st = con.prepareCall(arg0);
 		PooledCallableStatement pst = new PooledCallableStatement(this,st);
@@ -333,6 +368,7 @@ public class PooledConnection implements BindConnection {
 	 * @return
 	 * @throws java.sql.SQLException
 	 */
+	@Override
 	public CallableStatement prepareCall(String arg0, int arg1, int arg2)
 			throws SQLException {
 		CallableStatement st = con.prepareCall(arg0, arg1, arg2);
@@ -348,6 +384,7 @@ public class PooledConnection implements BindConnection {
 	 * @return
 	 * @throws java.sql.SQLException
 	 */
+	@Override
 	public CallableStatement prepareCall(String arg0, int arg1, int arg2,
 			int arg3) throws SQLException {
 		CallableStatement st = con.prepareCall(arg0, arg1, arg2, arg3);
@@ -360,6 +397,7 @@ public class PooledConnection implements BindConnection {
 	 * @return
 	 * @throws java.sql.SQLException
 	 */
+	@Override
 	public PreparedStatement prepareStatement(String arg0) throws SQLException {
 		PreparedStatement st = con.prepareStatement(arg0);
 		PooledPreparedStatement pst = new PooledPreparedStatement(this,st);
@@ -372,6 +410,7 @@ public class PooledConnection implements BindConnection {
 	 * @return
 	 * @throws java.sql.SQLException
 	 */
+	@Override
 	public PreparedStatement prepareStatement(String arg0, int arg1)
 			throws SQLException {
 		PreparedStatement st = con.prepareStatement(arg0, arg1);
@@ -387,6 +426,7 @@ public class PooledConnection implements BindConnection {
 	 * @return
 	 * @throws java.sql.SQLException
 	 */
+	@Override
 	public PreparedStatement prepareStatement(String arg0, int arg1, int arg2)
 			throws SQLException {
 		PreparedStatement st = con.prepareStatement(arg0, arg1, arg2);
@@ -403,6 +443,7 @@ public class PooledConnection implements BindConnection {
 	 * @return
 	 * @throws java.sql.SQLException
 	 */
+	@Override
 	public PreparedStatement prepareStatement(String arg0, int arg1, int arg2,
 			int arg3) throws SQLException {
 		PreparedStatement st = con.prepareStatement(arg0, arg1, arg2, arg3);
@@ -417,6 +458,7 @@ public class PooledConnection implements BindConnection {
 	 * @return
 	 * @throws java.sql.SQLException
 	 */
+	@Override
 	public PreparedStatement prepareStatement(String arg0, int[] arg1)
 			throws SQLException {
 		PreparedStatement st = con.prepareStatement(arg0, arg1);
@@ -431,6 +473,7 @@ public class PooledConnection implements BindConnection {
 	 * @return
 	 * @throws java.sql.SQLException
 	 */
+	@Override
 	public PreparedStatement prepareStatement(String arg0, String[] arg1)
 			throws SQLException {
 		PreparedStatement st = con.prepareStatement(arg0, arg1);
@@ -443,12 +486,14 @@ public class PooledConnection implements BindConnection {
 	 * @param arg0
 	 * @throws java.sql.SQLException
 	 */
+	@Override
 	public void releaseSavepoint(Savepoint arg0) throws SQLException {
 		con.releaseSavepoint(arg0);
 	}
 	/**
 	 * @throws java.sql.SQLException
 	 */
+	@Override
 	public void rollback() throws SQLException {
 		con.rollback();
 	}
@@ -456,6 +501,7 @@ public class PooledConnection implements BindConnection {
 	 * @param arg0
 	 * @throws java.sql.SQLException
 	 */
+	@Override
 	public void rollback(Savepoint arg0) throws SQLException {
 		con.rollback(arg0);
 	}
@@ -463,6 +509,7 @@ public class PooledConnection implements BindConnection {
 	 * @param arg0
 	 * @throws java.sql.SQLException
 	 */
+	@Override
 	public void setAutoCommit(boolean arg0) throws SQLException {
 		con.setAutoCommit(arg0);
 	}
@@ -470,6 +517,7 @@ public class PooledConnection implements BindConnection {
 	 * @param arg0
 	 * @throws java.sql.SQLException
 	 */
+	@Override
 	public void setCatalog(String arg0) throws SQLException {
 		con.setCatalog(arg0);
 	}
@@ -477,6 +525,7 @@ public class PooledConnection implements BindConnection {
 	 * @param arg0
 	 * @throws java.sql.SQLException
 	 */
+	@Override
 	public void setHoldability(int arg0) throws SQLException {
 		con.setHoldability(arg0);
 	}
@@ -484,6 +533,7 @@ public class PooledConnection implements BindConnection {
 	 * @param arg0
 	 * @throws java.sql.SQLException
 	 */
+	@Override
 	public void setReadOnly(boolean arg0) throws SQLException {
 		con.setReadOnly(arg0);
 	}
@@ -491,6 +541,7 @@ public class PooledConnection implements BindConnection {
 	 * @return
 	 * @throws java.sql.SQLException
 	 */
+	@Override
 	public Savepoint setSavepoint() throws SQLException {
 		return con.setSavepoint();
 	}
@@ -499,6 +550,7 @@ public class PooledConnection implements BindConnection {
 	 * @return
 	 * @throws java.sql.SQLException
 	 */
+	@Override
 	public Savepoint setSavepoint(String arg0) throws SQLException {
 		return con.setSavepoint(arg0);
 	}
@@ -506,6 +558,7 @@ public class PooledConnection implements BindConnection {
 	 * @param arg0
 	 * @throws java.sql.SQLException
 	 */
+	@Override
 	public void setTransactionIsolation(int arg0) throws SQLException {
 		con.setTransactionIsolation(arg0);
 	}
@@ -513,6 +566,7 @@ public class PooledConnection implements BindConnection {
 	 * @param arg0
 	 * @throws java.sql.SQLException
 	 */
+	@Override
 	public void setTypeMap(Map<String, Class<?>> arg0) throws SQLException {
 		con.setTypeMap(arg0);
 	}
@@ -523,6 +577,7 @@ public class PooledConnection implements BindConnection {
 	 * @throws SQLException
 	 * @see java.sql.Connection#createArrayOf(java.lang.String, java.lang.Object[])
 	 */
+	@Override
 	public Array createArrayOf(String typeName, Object[] elements)
 			throws SQLException {
 		return con.createArrayOf(typeName, elements);
@@ -533,6 +588,7 @@ public class PooledConnection implements BindConnection {
 	 * @throws SQLException
 	 * @see java.sql.Connection#createBlob()
 	 */
+	@Override
 	public Blob createBlob() throws SQLException {
 		return con.createBlob();
 	}
@@ -542,6 +598,7 @@ public class PooledConnection implements BindConnection {
 	 * @throws SQLException
 	 * @see java.sql.Connection#createClob()
 	 */
+	@Override
 	public Clob createClob() throws SQLException {
 		return con.createClob();
 	}
@@ -551,6 +608,7 @@ public class PooledConnection implements BindConnection {
 	 * @throws SQLException
 	 * @see java.sql.Connection#createNClob()
 	 */
+	@Override
 	public NClob createNClob() throws SQLException {
 		return con.createNClob();
 	}
@@ -560,6 +618,7 @@ public class PooledConnection implements BindConnection {
 	 * @throws SQLException
 	 * @see java.sql.Connection#createSQLXML()
 	 */
+	@Override
 	public SQLXML createSQLXML() throws SQLException {
 		return con.createSQLXML();
 	}
@@ -571,6 +630,7 @@ public class PooledConnection implements BindConnection {
 	 * @throws SQLException
 	 * @see java.sql.Connection#createStruct(java.lang.String, java.lang.Object[])
 	 */
+	@Override
 	public Struct createStruct(String typeName, Object[] attributes)
 			throws SQLException {
 		return con.createStruct(typeName, attributes);
@@ -581,6 +641,7 @@ public class PooledConnection implements BindConnection {
 	 * @throws SQLException
 	 * @see java.sql.Connection#getClientInfo()
 	 */
+	@Override
 	public Properties getClientInfo() throws SQLException {
 		return con.getClientInfo();
 	}
@@ -591,6 +652,7 @@ public class PooledConnection implements BindConnection {
 	 * @throws SQLException
 	 * @see java.sql.Connection#getClientInfo(java.lang.String)
 	 */
+	@Override
 	public String getClientInfo(String name) throws SQLException {
 		return con.getClientInfo(name);
 	}
@@ -601,6 +663,7 @@ public class PooledConnection implements BindConnection {
 	 * @throws SQLException
 	 * @see java.sql.Connection#isValid(int)
 	 */
+	@Override
 	public boolean isValid(int timeout) throws SQLException {
 		return con.isValid(timeout);
 	}
@@ -611,6 +674,7 @@ public class PooledConnection implements BindConnection {
 	 * @throws SQLException
 	 * @see java.sql.Wrapper#isWrapperFor(java.lang.Class)
 	 */
+	@Override
 	public boolean isWrapperFor(Class<?> iface) throws SQLException {
 		return con.isWrapperFor(iface);
 	}
@@ -620,6 +684,7 @@ public class PooledConnection implements BindConnection {
 	 * @throws SQLClientInfoException
 	 * @see java.sql.Connection#setClientInfo(java.util.Properties)
 	 */
+	@Override
 	public void setClientInfo(Properties properties)
 			throws SQLClientInfoException {
 		con.setClientInfo(properties);
@@ -631,6 +696,7 @@ public class PooledConnection implements BindConnection {
 	 * @throws SQLClientInfoException
 	 * @see java.sql.Connection#setClientInfo(java.lang.String, java.lang.String)
 	 */
+	@Override
 	public void setClientInfo(String name, String value)
 			throws SQLClientInfoException {
 		con.setClientInfo(name, value);
@@ -643,6 +709,7 @@ public class PooledConnection implements BindConnection {
 	 * @throws SQLException
 	 * @see java.sql.Wrapper#unwrap(java.lang.Class)
 	 */
+	@Override
 	@SuppressWarnings("unchecked")
 	public <T> T unwrap(Class<T> iface) throws SQLException {
 		return (T)this;

@@ -14,7 +14,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,7 +39,7 @@ public class ConnectionPool{
 	/**
 	 * DB接続情報
 	 */
-	private ConnectInfo connectInfo;
+	private final ConnectInfo connectInfo;
 	public ConnectInfo getConnectInfo(){
 		return connectInfo;
 	}
@@ -486,5 +485,20 @@ public class ConnectionPool{
 	 */
 	public int getPoolCount(){
 		return poolList.size();
+	}
+
+	/**
+	 * Close all physical connections.
+	 *
+	 * @return
+	 * @throws SQLException
+	 */
+	public int physicalClose() throws SQLException{
+		int result=0;
+		for(PooledConnection con: useList){
+			con.close();
+			result++;
+		}
+		return result;
 	}
 }
