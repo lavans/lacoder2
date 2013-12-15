@@ -510,7 +510,7 @@ public class ConnectionPool{
 		int result=0;
 		synchronized (list) {
 			for(PooledConnection con: list){
-				con.close();
+				con.physicalClose();
 				result++;
 			}
 			list.clear();
