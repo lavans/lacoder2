@@ -300,7 +300,7 @@ public class SimpleHttpClient {
 
 	public static class Builder {
 		private static final String DEFAULT_CHARSET="UTF-8";
-		private static final int DEFAULT_TIMEOUT = 50000; // 5000
+		private static final int DEFAULT_TIMEOUT = 60000; // 5000
 		/**
 		 * Constructor.
 		 *
