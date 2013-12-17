@@ -32,8 +32,8 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils{
 	 * @param dateStr
 	 * @return
 	 */
-	public static Date getDate(String dateStr){
-		return getDate(dateStr, getFormat(dateStr));
+	public static Date parseDateOrNull(String dateStr){
+		return parseDateOrNull(dateStr, getFormat(dateStr));
 	}
 	/**
 	 * yyyy/MM/dd形式の文字列からDate型を作成。
@@ -86,7 +86,7 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils{
 	 * @param dateFormat
 	 * @return
 	 */
-	public static Date getDate(String dateStr, String dateFormat){
+	public static Date parseDateOrNull(String dateStr, String dateFormat){
 		if(dateStr==null) return null;
 		SimpleDateFormat sdf = new SimpleDateFormat(dateFormat);
 		Date date = null;
