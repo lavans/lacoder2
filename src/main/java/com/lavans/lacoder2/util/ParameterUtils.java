@@ -49,7 +49,6 @@ public class ParameterUtils {
 	}
 	public static Map<String, String[]> toMap(String str, String encoding){
 		Map<String, String[]> params = new HashMap<String, String[]>();
-		if(!str.contains("=")) return params;
 		String strs[] = str.split("&");
 		for(int i = 0; i < strs.length; i++){
 			if(strs[i].equals("")){
