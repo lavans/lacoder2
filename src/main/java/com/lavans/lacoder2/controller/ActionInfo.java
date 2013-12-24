@@ -68,6 +68,8 @@ public class ActionInfo {
 		info.relativePath = actionURI.substring(0,actionURI.lastIndexOf("/"));
 		// path="com.company.project.presentation.admin.action.main";
 		info.path = actionConfig.actionPath + info.relativePath.replace("/",".");
+		// delete first "." (if web-app action-path is not defined).
+		if(info.path.startsWith(".")) info.path = info.path.substring(1);
 	}
 
 	/**

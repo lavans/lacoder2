@@ -351,7 +351,7 @@ public class ActionServlet extends HttpServlet {
 		}
 		// Check whether action URI end with action-extention
 		String extension = actionURI.contains(".")?
-				actionURI.substring(actionURI.indexOf(".")+1):"";
+				actionURI.substring(actionURI.lastIndexOf(".")+1):"";
 		if(!webAppConfig.extenstions.contains(extension)){
 			return null;
 		}
