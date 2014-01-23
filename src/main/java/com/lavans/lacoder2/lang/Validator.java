@@ -42,7 +42,7 @@ public class Validator {
 	private static List<String> domainList = null;
 	static{
 		try {
-			domainList = Config.getInstance("mobile.xml").getNodeValueList("/root/mobile/domain");
+			domainList = Config.getInstance("mobile.xml").getNodeValueList("/root/mobile_mail/domain");
 		} catch (RuntimeException e) {
 			logger.info("携帯メールドメイン指定無し");
 		}
