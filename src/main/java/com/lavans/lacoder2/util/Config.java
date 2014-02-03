@@ -402,7 +402,7 @@ public class Config {
 	}
 
 	/**
-	 * luz.xml(Configのデフォルトインスタンス)にあるデバッグモードを返す。
+	 * 設定ファイルにあるデバッグモードを返す。
 	 * @return
 	 */
 	public static boolean isDebug(){
