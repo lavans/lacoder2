@@ -75,17 +75,28 @@ public class RemoteInterceptor implements MethodInterceptor{
 		return localMethodNameSet.contains(method.getName());
 	}
 
+	/**
+	 * Check if argumets contains null.
+	 * @param method
+	 * @param args
+	 */
 	private void checkNullParams(Method method, Object[] args) {
 		for (int i = 0; i < args.length; i++) {
 			Object obj = args[i];
 			if (obj == null) {
-				String msg = method.getDeclaringClass().getSimpleName() + "#" + method.getName() + "("+ pringArgs(args) +")contains (null) parameter.";
+				String msg = method.getDeclaringClass().getSimpleName() + "#" + method.getName()
+						+ "("+ pringArgs(args) +")contains (null) parameter.";
 				throw new NullPointerException(msg);
 			}
 		}
-
 	}
 
+	/**
+	 * Joins the elements of the provided array into a single String.
+	 * null will be converted to "(null)".
+	 * @param args
+	 * @return
+	 */
 	private String pringArgs(Object[] args){
 		StringBuilder bf = new StringBuilder();
 		for(Object arg: args){

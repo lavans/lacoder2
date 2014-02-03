@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -22,7 +21,6 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
-
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -83,10 +81,6 @@ public class Config {
 	/** デバッグモード */
 	private boolean isDebug = false;
 
-	/** luz.xmlで指定できるようにする */
-	public static Level getLuzLogLevel(){
-		return Level.FINEST;
-	}
 	/**
 	 * インスタンス取得。設定ファイル名指定無しならlacoder.xmlから読み込む。
 	 * @return
