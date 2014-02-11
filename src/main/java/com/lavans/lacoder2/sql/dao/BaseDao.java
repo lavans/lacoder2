@@ -216,6 +216,9 @@ public class BaseDao{
 	 * @param searchCondMap
 	 * @return
 	 */
+	public <T> List<T> list(Class<T> clazz) {
+		return doList("list", clazz, null, DEFAULT_CONNECTION_NAME);
+	}
 	public <T> List<T> list(Class<T> clazz, Condition cond) {
 		return doList("list", clazz, cond, DEFAULT_CONNECTION_NAME);
 	}
@@ -229,6 +232,9 @@ public class BaseDao{
 	 * @param cond
 	 * @return
 	 */
+	public <T> List<T> listPk(Class<T> clazz) {
+		return doList("listPk", clazz, null, DEFAULT_CONNECTION_NAME);
+	}
 	public <T> List<T> listPk(Class<T> clazz, Condition cond) {
 		return doList("listPk", clazz, cond, DEFAULT_CONNECTION_NAME);
 	}
