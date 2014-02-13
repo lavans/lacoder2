@@ -153,6 +153,7 @@ public class NumberUtils extends org.apache.commons.lang3.math.NumberUtils{
 	/**
 	 * 文字列配列をIntegerの配列に変換。
 	 * 文字列が"n-m"の形式の時はnからmの間の数値も生成する。
+	 * 改行は無視します。
 	 *
 	 * @param src
 	 * @return
@@ -160,6 +161,7 @@ public class NumberUtils extends org.apache.commons.lang3.math.NumberUtils{
 	public static Integer[] toIntegerArray(String[] strs) {
 		ArrayList<Integer> list = new ArrayList<>();
 		for (String str: strs) {
+			if(str.isEmpty()) continue;
 			Integer[] values = parseRange(str);
 			for(int value: values){
 				list.add(value);
