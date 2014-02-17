@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE luz>
+<root>
+    <!-- TODO ConfigFile指定 -->
+  <web-app>
+    <service-path>com.lavans.lacoder2.remote.servlet</service-path>
+  </web-app>
+
+	<!-- dummy server group -->
+  <server-group name="bl">
+    <server-node name="bl1" uri="http://127.0.0.1:8080/bl/rs/" />
+  </server-group>
+
+  <parameter name="debug" value="true" />
+
+  <database statistics="true">
+    <connection name="default">
+      <driver>org.postgresql.Driver</driver>
+      <url>jdbc:postgresql://host/database</url>
+      <user>user</user>
+      <pass>pass</pass>
+      <logging>true</logging>
+      <init-connections>1</init-connections>
+      <max-connections>50</max-connections>
+      <!-- <valid_sql>select now()</valid_sql> -->
+    </connection>
+  </database>
+</root>
