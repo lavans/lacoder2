@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
  * 1分おきにSystem.gc()を呼び出してlogにGCの結果を書き出す。
  * -verbose:gcで起動するとcatalina.outにGCのログが出るが時刻がわからないので
  * 1分置きにSystem.outに時刻を出力する。
- * luz.xmlに下記を書いておけばlog、System.out共に表示しなくなる。
+ * 設定ファイルに下記を書いておけばlog、System.out共に表示しなくなる。
  * <param name="gctimer.show" value="false"/>
  *
  * GCの間隔(単位：秒) デフォルト60秒

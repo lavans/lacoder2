@@ -35,6 +35,9 @@ public class RemoteInterceptor implements MethodInterceptor{
 		if(isLocalOnly(method)){
 			return method.invoke(obj, args);
 		}
+
+		checkNullParams(method, args);
+
 		// Remote execute
 		Connector connector = connectManager.getConnector(serverGroup);
 		if(connector == null){
@@ -70,5 +73,35 @@ public class RemoteInterceptor implements MethodInterceptor{
 	 */
 	private boolean isLocalOnly(Method method){
 		return localMethodNameSet.contains(method.getName());
+	}
+
+	/**
+	 * Check if argumets contains null.
+	 * @param method
+	 * @param args
+	 */
+	private void checkNullParams(Method method, Object[] args) {
+		for (int i = 0; i < args.length; i++) {
+			Object obj = args[i];
+			if (obj == null) {
+				String msg = method.getDeclaringClass().getSimpleName() + "#" + method.getName()
+						+ "("+ pringArgs(args) +")contains (null) parameter.";
+				throw new NullPointerException(msg);
+			}
+		}
+	}
+
+	/**
+	 * Joins the elements of the provided array into a single String.
+	 * null will be converted to "(null)".
+	 * @param args
+	 * @return
+	 */
+	private String pringArgs(Object[] args){
+		StringBuilder bf = new StringBuilder();
+		for(Object arg: args){
+			bf.append(",").append(arg==null?"(null)":arg.toString());
+		}
+		return bf.substring(1);
 	}
 }

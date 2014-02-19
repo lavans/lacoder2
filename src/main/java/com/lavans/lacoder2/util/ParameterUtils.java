@@ -7,6 +7,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
+import lombok.val;
+
 import org.slf4j.Logger;
 
 import com.lavans.lacoder2.lang.LogUtils;
@@ -82,6 +84,20 @@ public class ParameterUtils {
 		}
 
 		return params;
+	}
+
+	/**
+	 * ターゲットをStringに変換。key1=value1形式。Parameter複数。
+	 * プリフィクス、エンコード無し。
+	 * @param target
+	 * @return
+	 */
+	public static String toStoreString(Parameterizable... targets){
+		val builder = new StringBuilder();
+		for(val target: targets){
+			builder.append(toStoreString(target, "", null));
+		}
+		return builder.toString();
 	}
 
 	/**
