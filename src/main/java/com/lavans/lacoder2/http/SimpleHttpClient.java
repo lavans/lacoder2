@@ -24,7 +24,6 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.X509TrustManager;
 
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,7 +63,7 @@ public class SimpleHttpClient {
 	/** logger */
 	private static final Logger logger = LoggerFactory.getLogger(SimpleHttpClient.class);
 
-	public enum Method { GET, POST, HEAD }
+	public enum Method { GET, POST, PUT, HEAD, DELETE}
 
 	// Build parameter
 	/** url. required. */
@@ -169,7 +168,7 @@ public class SimpleHttpClient {
 		for(Entry<String, String> entry: requestProperties.entrySet()){
 			con.setRequestProperty(entry.getKey(), entry.getValue());
 		}
-		if(method==Method.POST){
+		if(postData!=null){
 			con.setDoOutput(true);
 		}
 
