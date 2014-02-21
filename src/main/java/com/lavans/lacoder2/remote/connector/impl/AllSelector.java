@@ -37,7 +37,7 @@ public class AllSelector implements Selector{
 			try {
 				SimpleHttpClient client = SimpleHttpClient.Builder
 						.simpleHttpClient(node.getUri() + pathInfo)
-						.withPostData(postData)
+						.withOutput(postData)
 						.build();
 				list.add(new ServerConnectInfo(node, client));
 			}catch(IOException e){

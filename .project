@@ -25,6 +25,11 @@
 			<arguments>
 			</arguments>
 		</buildCommand>
+		<buildCommand>
+			<name>org.eclipse.linuxtools.rpm.rpmlint.rpmlintBuilder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
 	</buildSpec>
 	<natures>
 		<nature>org.eclipse.jem.workbench.JavaEMFNature</nature>
@@ -33,5 +38,6 @@
 		<nature>org.eclipse.m2e.core.maven2Nature</nature>
 		<nature>org.eclipse.wst.common.project.facet.core.nature</nature>
 		<nature>org.apache.ivyde.eclipse.ivynature</nature>
+		<nature>org.eclipse.linuxtools.rpm.rpmlint.rpmlintNature</nature>
 	</natures>
 </projectDescription>

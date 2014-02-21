@@ -46,7 +46,7 @@ import com.lavans.lacoder2.util.ParameterUtils;
  * <pre>{@code
  * 	SimpleHttpClient client = SimpleHttpClient.Builder
  *			.simpleHttpClient(url);
- *			.withPostData(postData)
+ *			.withPostData(output)
  *			.build();
  * HttpResponse response = client.request();
  * String content = response.getContentes
@@ -70,19 +70,19 @@ public class SimpleHttpClient {
 	private String urlStr=null;
 	private HttpURLConnection con = null;
 	private String charset=null;
-	private String postData=null;
+	private String output=null;
 	private Method method = Method.GET;
 	private int timeout;
 	private Map<String, String> requestProperties=null;
 
 	protected SimpleHttpClient(){
 	}
-	protected void setParameters(String urlStr, String charset, String postData, Method method, int timeout, Map<String, String> requestProperties){
+	protected void setParameters(Method method, String urlStr, String output, String charset, int timeout, Map<String, String> requestProperties){
 		//logger.debug("setParameters");
-		this.urlStr = urlStr;
-		this.charset = charset;
-		this.postData = postData;
 		this.method = method;
+		this.urlStr = urlStr;
+		this.output = output;
+		this.charset = charset;
 		this.timeout = timeout;
 		this.requestProperties = requestProperties;
 	}
@@ -111,19 +111,24 @@ public class SimpleHttpClient {
 	 * @throws RuntimeException IOExceptionが発生した場合。
 	 */
 	public static String post(String url, String data) {
-		try {
-			SimpleHttpClient client = Builder.simpleHttpClient(url)
-					.withPostData(data)
-					.build();
-			return client.request().getContents();
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+		return request(Method.POST, url, data);
 	}
 	public static String post(String url, Map<String,String> params) {
+		String data = ParameterUtils.toStoreString(ParameterUtils.convertToStringArrayMap(params),Builder.DEFAULT_CHARSET);
+		return request(Method.POST, url, data);
+	}
+	public static String put(String url, String data) {
+		return request(Method.PUT, url, data);
+	}
+	public static String put(String url, Map<String,String> params) {
+		String data = ParameterUtils.toStoreString(ParameterUtils.convertToStringArrayMap(params),Builder.DEFAULT_CHARSET);
+		return request(Method.PUT, url, data);
+	}
+	public static String request(Method method, String url, String data) {
 		try {
 			SimpleHttpClient client = Builder.simpleHttpClient(url)
-					.withPostData(params)
+					.withMethod(method)
+					.withOutput(data)
 					.build();
 			return client.request().getContents();
 		} catch (IOException e) {
@@ -168,7 +173,7 @@ public class SimpleHttpClient {
 		for(Entry<String, String> entry: requestProperties.entrySet()){
 			con.setRequestProperty(entry.getKey(), entry.getValue());
 		}
-		if(postData!=null){
+		if(output!=null){
 			con.setDoOutput(true);
 		}
 
@@ -184,14 +189,14 @@ public class SimpleHttpClient {
 	 */
 	public HttpResponse request() throws IOException {
 		// debug
-		logger.debug(urlStr); // + (postData==null?"":" post["+ postData +"]"));
+		logger.debug(urlStr); // + (output==null?"":" post["+ output +"]"));
 
 		if(urlStr.contains("java.lang")){
 			throw new RuntimeException(urlStr + " contains JDK class.");
 		}
 
 		// POSTの時
-		if(postData!=null){
+		if(output!=null){
 			doPost(con);
 		}
 		try(InputStream is = getInputStream(con)){
@@ -242,7 +247,7 @@ public class SimpleHttpClient {
 	 */
 	private void doPost(URLConnection con) throws IOException{
 		try(PrintStream os = new PrintStream(con.getOutputStream())){
-			os.print(postData);
+			os.print(output);
 			os.flush();
 		}
 	}
@@ -325,7 +330,7 @@ public class SimpleHttpClient {
 		private String urlStr=null;
 		private String charset=DEFAULT_CHARSET;
 		private String query=null;
-		private String postData=null;
+		private String output=null;
 		private Map<String,String> postParams=null;
 		private Method method = Method.GET;
 		private int timeout = DEFAULT_TIMEOUT;
@@ -334,6 +339,23 @@ public class SimpleHttpClient {
 			put("User-Agent", "HttpClient");
 			put("Accept-Encoding", "gzip,deflate");
 		}};
+
+		/**
+		 * methodをセットする。ビルダー。
+		 *
+		 *
+		 * @param url
+		 * @return
+		 */
+		public Builder withMethod(Method method){
+			this.method = method;
+			return this;
+		}
+		public Builder withMethod(String methodStr){
+			this.method = Method.valueOf(methodStr);
+			if(this.method==null) throw new IllegalArgumentException("no such method["+ methodStr +"]");
+			return this;
+		}
 
 		/**
 		 * charsetをセットする。ビルダー。
@@ -361,34 +383,31 @@ public class SimpleHttpClient {
 		}
 
 		/**
-		 * postDataをセットする。ビルダー。
+		 * outputをセットする。ビルダー。
 		 * POSTメソッドで渡すデータ。
-		 * postDataをセットしたらメソッドは自動的にPOST
+		 * outputをセットしたらメソッドは自動的にPOST
 		 *
 		 * @param url
 		 * @return
 		 */
-		public Builder withPostData(String postData){
-			if(!StringUtils.isEmpty(postData)){
-				this.postData = postData;
-				this.method = Method.POST;
+		public Builder withOutput(String output){
+			if(!StringUtils.isEmpty(output)){
+				this.output = output;
 			}
 			return this;
 		}
 
 		/**
-		 * postDataをセットする。ビルダー。
+		 * outputをセットする。ビルダー。
 		 * POSTメソッドで渡すデータ。Map形式。
 		 * 既にセット済みのデータがある場合は上書きされる。
-		 * デフォルトではUTF-8URLエンコードするので、charset変更の必要がある場合はこのメソッドを呼ぶ前に
-		 * setCharset(String)する。
+		 * デフォルトではUTF-8URLエンコードするので、charset変更の必要がある場合は setCharset(String)する。
 		 *
 		 * @param url
 		 * @return
 		 */
-		public Builder withPostData(Map<String, String> postParams){
+		public Builder withOutput(Map<String, String> postParams){
 			this.postParams = postParams;
-			this.method = Method.POST;
 			return this;
 		}
 
@@ -428,10 +447,14 @@ public class SimpleHttpClient {
 				urlStr += "?"+query;
 			}
 			if(postParams!=null){
-				postData = ParameterUtils.toStoreString(ParameterUtils.convertToStringArrayMap(postParams),charset);
+				output = ParameterUtils.toStoreString(ParameterUtils.convertToStringArrayMap(postParams),charset);
+			}
+			// GETの場合はPOSTにしておく。PUTはwithMethod()で明示的に指定する必要がある。
+			if(!StringUtils.isEmpty(output) && method == Method.GET){
+				method = Method.POST;
 			}
 			SimpleHttpClient client = BeanManager.getBean(SimpleHttpClient.class);
-			client.setParameters(urlStr, charset, postData, method, timeout, requestProperties);
+			client.setParameters(method, urlStr, output, charset, timeout, requestProperties);
 			client.connect();
 			return client;
 		}

@@ -140,9 +140,7 @@ public class Config {
 			// debugの取得
 			isDebug = getParameterBoolean("debug");
 		} catch (SAXException | IOException | ParserConfigurationException e) {
-			// どこでRuntimeに入れるか検討
-			logger.error("Can't parse xml file.["+ fileName +"]", e);
-			throw new RuntimeException(e);
+			throw new RuntimeException("Can't parse xml file.["+ fileName +"]",e);
 		}
 	}
 

@@ -36,7 +36,7 @@ public class RoundrobinSelector implements Selector{
 			try {
 				SimpleHttpClient client = SimpleHttpClient.Builder
 						.simpleHttpClient(node.getUri() + url)
-						.withPostData(postData)
+						.withOutput(postData)
 						.build();
 				List<ServerConnectInfo> list = new ArrayList<>();
 				list.add(new ServerConnectInfo(node, client));
