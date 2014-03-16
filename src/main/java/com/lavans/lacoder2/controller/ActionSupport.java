@@ -108,11 +108,22 @@ public class ActionSupport {
 	 * @param key
 	 * @param value
 	 */
+	@SuppressWarnings("unchecked")
+	public <T> T  getAttribute(String key){
+		return (T)request.getAttribute(key);
+	}
+
+	/**
+	 * set request attribute
+	 * @param key
+	 * @param value
+	 */
 	public void setAllAttributes(Map<String, Object> map){
 		for(Entry<String, Object> entry: map.entrySet()){
 			request.setAttribute(entry.getKey(), entry.getValue());
 		}
 	}
+
 	/**
 	 * set request attribute
 	 * @param key
@@ -121,6 +132,7 @@ public class ActionSupport {
 	public void setAttribute(String key, Object value){
 		request.setAttribute(key, value);
 	}
+
 	/**
 	 * getParameter
 	 * @param key
