@@ -1,8 +1,5 @@
 package com.lavans.lacoder2.sql.dbutils.dbms;
 
-import java.math.BigDecimal;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -13,6 +10,7 @@ import org.slf4j.Logger;
 import com.lavans.lacoder2.di.BeanManager;
 import com.lavans.lacoder2.di.annotation.Scope;
 import com.lavans.lacoder2.di.annotation.Type;
+import com.lavans.lacoder2.lang.ArrayUtils;
 import com.lavans.lacoder2.lang.LogUtils;
 import com.lavans.lacoder2.sql.dao.CommonDao;
 import com.lavans.lacoder2.sql.dbutils.model.Column;
@@ -110,19 +108,24 @@ public class PostgresUtils implements DbmsUtils{
 	}
 
 	/**
-	 * TODO
 	 * DBのTYPEからJavaのTypeを返す
 	 * @return
 	 */
+	private static final String[] LONG_TYPES = new String[]{"bigint","int8"};
+	private static final String[] INT_TYPES = new String[]{"int","int4"};
 	private String getJavaType(String dbType){
-		if(dbType.startsWith("NUMBER")){
-			return "BigDecimal";
+		if(ArrayUtils.contains(LONG_TYPES,  dbType)){
+			return "long";
 		}
-		if(dbType.startsWith("TIMESTAMP")){
+		if(ArrayUtils.contains(INT_TYPES,  dbType)){
+			return "int";
+		}
+		if(dbType.startsWith("timestamp")){
 			return "Date";
 		}
 		return "String";
 	}
+
 
 	/**
 	 * limit offset sql 作成。
