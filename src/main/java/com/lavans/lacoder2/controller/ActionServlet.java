@@ -80,6 +80,7 @@ public class ActionServlet extends HttpServlet {
 			request.parameterMap.clear();
 			// put this time POST string.
 			request.parameterMap.putAll(ParameterUtils.toMap(query, webAppConfig.encoding));
+			request.queryString = query;
 		}
 
 		doService(request, response);
@@ -142,10 +143,12 @@ public class ActionServlet extends HttpServlet {
 			throws ServletException, IOException {
 		// wrap for parameter edit
 		HttpRequestParamWrapper request= new HttpRequestParamWrapper(requestOrg);
-		if(requestOrg.getQueryString()!=null){
+		String query = requestOrg.getQueryString();
+		if(query!=null){
 			request.parameterMap.clear();
-			request.parameterMap.putAll(ParameterUtils.toMap(requestOrg.getQueryString(), webAppConfig.encoding));
+			request.parameterMap.putAll(ParameterUtils.toMap(query, webAppConfig.encoding));
 		}
+		request.queryString = query;
 		doService(request, response);
 	}
 
@@ -458,6 +461,7 @@ public class ActionServlet extends HttpServlet {
 	protected class HttpRequestParamWrapper extends HttpServletRequestWrapper {
 		private Map<String, String[]> parameterMap;
 		private Map<String, List<FileItem>> multipartMap;
+		private String queryString;
 		public HttpRequestParamWrapper(HttpServletRequest request) {
 			super(request);
 			parameterMap = new HashMap<String, String[]>(request.getParameterMap());
@@ -506,6 +510,11 @@ public class ActionServlet extends HttpServlet {
 		@Override
 		public String[] getParameterValues(String name) {
 			return parameterMap.get(name);
+		}
+
+		@Override
+		public String getQueryString(){
+			return queryString;
 		}
 	}
 }
