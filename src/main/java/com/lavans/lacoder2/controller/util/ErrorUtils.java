@@ -8,6 +8,11 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import lombok.extern.slf4j.Slf4j;
+
+import com.lavans.lacoder2.util.ParameterUtils;
+
+@Slf4j
 public class ErrorUtils {
 	/**
 	 * リクエスト情報、ユーザエージェント等詳細な内容を取得します。
@@ -16,7 +21,7 @@ public class ErrorUtils {
 	 * @return         文字列
 	 */
 	public static String getRequestDetailString(HttpServletRequest request) {
-    	StringBuffer buffer = new StringBuffer(4096);
+    	StringBuilder buffer = new StringBuilder(4096);
 
 		// リクエスト情報を付加
 		buffer.append("\n");
@@ -41,7 +46,7 @@ public class ErrorUtils {
 		// リクエストパラメータを取得
 		Map<String, String[]> parameterMap = request.getParameterMap();
 
-		StringBuffer buffer = new StringBuffer(512);
+		StringBuilder buffer = new StringBuilder(512);
 		// リクエストパラメータを付加
 		List<String> keyList = new LinkedList<>();
 		keyList.addAll(parameterMap.keySet());
@@ -49,9 +54,11 @@ public class ErrorUtils {
 		for (String key: keyList){
 			String values[] = parameterMap.get(key);
 			for(String value: values){
-				buffer.append("\n\t").append(key).append("=").append(value);
+				buffer.append("\n\t\"").append(key).append("\"=\"").append(value).append("\"");
 			}
 		}
+
+		log.info(ParameterUtils.toStoreString(request.getParameterMap()));
 
 		return "request params:["+ buffer.toString() + "]";
 	}
@@ -63,7 +70,7 @@ public class ErrorUtils {
 	 * @return        文字列
 	 */
 	private static String getRequestAttributeString(HttpServletRequest request){
-		StringBuffer buffer = new StringBuffer(512);
+		StringBuilder buffer = new StringBuilder(512);
 
 		Enumeration<String> attriKeys = request.getAttributeNames();
 		while (attriKeys.hasMoreElements()) {
@@ -91,7 +98,7 @@ public class ErrorUtils {
 	 */
 	private static String getRequestHeadersString(HttpServletRequest request){
 
-		StringBuffer buffer = new StringBuffer(512);
+		StringBuilder buffer = new StringBuilder(512);
 
 		Enumeration<String> names = request.getHeaderNames();
 
