@@ -44,7 +44,7 @@ public class FixedConnector implements Connector{
 		try{
 			SimpleHttpClient client = SimpleHttpClient.Builder
 					.simpleHttpClient(serverNode.getUri() + url)
-					.withPostData(postData)
+					.withOutput(postData)
 					.build();
 			HttpResponse response = client.request();
 			Object result = ObjectSerializer.deserialize(response.getContentsAsBinary());

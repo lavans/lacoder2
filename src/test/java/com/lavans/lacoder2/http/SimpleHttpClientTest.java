@@ -1,6 +1,6 @@
 package com.lavans.lacoder2.http;
 
-import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.*;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -11,8 +11,6 @@ import mockit.Mocked;
 
 import org.slf4j.Logger;
 
-import com.lavans.lacoder2.http.HttpResponse;
-import com.lavans.lacoder2.http.SimpleHttpClient;
 import com.lavans.lacoder2.lang.LogUtils;
 
 public class SimpleHttpClientTest {
