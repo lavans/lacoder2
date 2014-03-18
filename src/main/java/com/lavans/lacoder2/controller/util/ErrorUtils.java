@@ -10,8 +10,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import lombok.extern.slf4j.Slf4j;
 
-import com.lavans.lacoder2.util.ParameterUtils;
-
 @Slf4j
 public class ErrorUtils {
 	/**
@@ -52,13 +50,12 @@ public class ErrorUtils {
 		keyList.addAll(parameterMap.keySet());
 		Collections.sort(keyList);
 		for (String key: keyList){
+			log.info("key:"+key);
 			String values[] = parameterMap.get(key);
 			for(String value: values){
-				buffer.append("\n\t\"").append(key).append("\"=\"").append(value).append("\"");
+				buffer.append("\n\t").append(key).append("=").append(value);
 			}
 		}
-
-		log.info(ParameterUtils.toStoreString(request.getParameterMap()));
 
 		return "request params:["+ buffer.toString() + "]";
 	}
