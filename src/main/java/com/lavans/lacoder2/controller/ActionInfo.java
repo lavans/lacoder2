@@ -149,18 +149,17 @@ public class ActionInfo {
 	 * @return
 	 */
 	public Object createAction(){
-		Object action;
 		try {
-			action = actionClass.newInstance();
+			Object action = actionClass.newInstance();
 			if(action instanceof DefaultAction){
 				((DefaultAction) action).setInfo(actionName, methodName);
 			}
+			return action;
 		} catch (InstantiationException | IllegalAccessException e) {
 			throw new RuntimeException(e);
 		}
-
-		return action;
 	}
+
 	public Class<?> getActionClass(){
 		return actionClass;
 	}
