@@ -203,7 +203,7 @@ public class PooledConnection implements BindConnection {
 	public void clearStatementList(){
 		// close()をかけると本クラスのremoveStatementを呼ぶ。
 		while(statementList.size()>0){
-			logger.warn("statementList.size()>0 st.close()の呼び忘れが考えられる", new Exception());
+			//logger.warn("statementList.size()>0 st.close()の呼び忘れが考えられる", new Exception());
 			Statement st = statementList.remove(0);
 			if(!(st instanceof PooledStatement)){
 				logger.error("PooledでないStatementを保持");
