@@ -29,7 +29,7 @@ public class BaseDao{
 	/** logger */
 	private static Logger logger = LoggerFactory.getLogger(BaseDao.class);
 	/** Common dao */
-	private CommonDao dao = BeanManager.getBean(CommonDao.class);
+	private final CommonDao dao = BeanManager.getBean(CommonDao.class);
 
 	private static final String DEFAULT_CONNECTION_NAME = "default";
 
