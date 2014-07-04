@@ -128,6 +128,9 @@ public class RemoteInvoker {
 
 			ServiceInfo info = new ServiceInfo();
 			info.service = ServiceManager.getServiceLocal(serviceName);
+			if(info.service.getClass().getName().equals(Object.class.getName())){
+				logger.info("!!!Not injected. Please set concrete class to BeanManager:"+ serviceName );
+			}
 			info.methodName = urls[1];
 			logger.debug(serviceName+"#"+info.methodName+"()");
 
