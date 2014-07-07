@@ -2,6 +2,8 @@ package com.lavans.lacoder2.controller.util;
 
 import javax.servlet.http.HttpServletRequest;
 
+import lombok.val;
+
 import com.lavans.lacoder2.lang.StringUtils;
 
 /**
@@ -16,9 +18,17 @@ public class NetworkUtils {
 	 * @return
 	 */
 	public static String getRemoteAddr(HttpServletRequest request) {
-		  String ip = request.getHeader("x-forwarded-for");
-		  ip = StringUtils.isEmpty(ip) ? request.getRemoteAddr() : ip;
-		  return ip;
+		val result = request.getHeader("x-forwarded-for");
+		return StringUtils.defaultIfBlank(result, request.getRemoteAddr());
 	}
 
+	/**
+	 * リクエストされたHost名を返す。
+	 * @param request
+	 * @return
+	 */
+	public static String getRequestedHost(HttpServletRequest request) {
+		  val result = request.getHeader("x-forwarded-host");
+		  return StringUtils.defaultIfBlank(result, request.getHeader("Host"));
+	}
 }
