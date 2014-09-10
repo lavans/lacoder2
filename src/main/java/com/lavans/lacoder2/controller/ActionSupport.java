@@ -294,13 +294,24 @@ public class ActionSupport {
 	}
 
 	/**
+	 * html出力
+	 * @param document
+	 * @return
+	 */
+	protected String html(String text){
+		WriteUtils writeUtils = BeanManager.getBean(WriteUtils.class);
+		writeUtils.writeHtml(getResponse(), text, "UTF-8");
+
+		return NO_JSP;
+	}
+	/**
 	 * xml出力
 	 * @param document
 	 * @return
 	 */
-	protected String xml(Document document){
+	protected String xml(Document document,String charset){
 		WriteUtils writeUtils = BeanManager.getBean(WriteUtils.class);
-		writeUtils.writeXml(getResponse(), document);
+		writeUtils.writeXml(getResponse(), document, charset);
 
 		return NO_JSP;
 	}

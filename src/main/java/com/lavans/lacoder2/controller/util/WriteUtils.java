@@ -24,14 +24,15 @@ import org.w3c.dom.Document;
  */
 public class WriteUtils {
 	/**
-	 * Write Json data to response with "application/json" and "UTF-8".
+	 * 任意のテキストを出力する
 	 * @param response
 	 * @param data
+	 * @param contentType
+	 * @param encoding
 	 */
-	public void writeJson(HttpServletResponse response, String data){
-		// application/json or  text/javascript
-		response.setContentType("application/json; charset=UTF-8;");
-		response.setCharacterEncoding("UTF-8");
+	public void writeText(HttpServletResponse response, String data, String contentType, String encoding){
+		response.setContentType(contentType);
+		response.setCharacterEncoding(encoding);
 
 		PrintWriter writer=null;
 		try {
@@ -44,6 +45,26 @@ public class WriteUtils {
 		writer.close();
 	}
 
+	public void writeHtml(HttpServletResponse response, String data, String charset){
+		writeText(response, data, "text/html; charset="+ charset+";", charset);
+	}
+	/**
+	 * Write Json data to response with "application/json" and "UTF-8".
+	 * @param response
+	 * @param data
+	 */
+	public void writeJson(HttpServletResponse response, String data){
+		writeText(response, data, "application/json; charset=UTF-8;", "UTF-8");
+	}
+
+	/**
+	 * Write Json data to response with "application/json" and "UTF-8".
+	 * @param response
+	 * @param data
+	 */
+	public void writeJsonp(HttpServletResponse response, String data){
+		writeText(response, data, "application/javascript; charset=UTF-8;", "UTF-8");
+	}
 	/**
 	 * Write Image data to response with "image/gif".
 	 * @param response
@@ -71,18 +92,18 @@ public class WriteUtils {
 	 * @param document DOMの内容
 	 * @author k-tei
 	 */
-	public void writeXml(HttpServletResponse response, Document document) {
+	public void writeXml(HttpServletResponse response, Document document, String charset) {
 		PrintWriter out = null;
 		try {
 			//文字コードとMIMEタイプを指定する
-			response.setContentType("text/xml; charset=Shift_JIS");
+			response.setContentType("text/xml; charset="+ charset);
 			//出力ストリームを取得する
 			out = response.getWriter();
 
 			//DOMの内容をクライアントに出力する
 			TransformerFactory tfactory = TransformerFactory.newInstance();
 			Transformer transformer = tfactory.newTransformer();
-			transformer.setOutputProperty(OutputKeys.ENCODING, "Shift_JIS");
+			transformer.setOutputProperty(OutputKeys.ENCODING, charset);
 			transformer.transform(new DOMSource(document), new StreamResult(out));
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -94,31 +115,6 @@ public class WriteUtils {
 				}
 			}
 		}
-	}
-
-	/**
-	 * Write Json data to response with "application/json" and "UTF-8".
-	 * @param response
-	 * @param data
-	 */
-//	private static final String DEFAULT_CHARSET="UTF-8";
-//	public void writeHtml(HttpServletResponse response, String data){
-//		writeHtml(response, data, DEFAULT_CHARSET);
-//	}
-	public void writeHtml(HttpServletResponse response, String data, String charset){
-		// application/json or  text/javascript
-		response.setContentType("text/html; charset="+ charset+";");
-		response.setCharacterEncoding(charset);
-
-		PrintWriter writer=null;
-		try {
-			writer = response.getWriter();
-		} catch (IOException e) {
-			new RuntimeException(e);
-		}
-		writer.write(data);
-		writer.flush();
-		writer.close();
 	}
 
 	/**
