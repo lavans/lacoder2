@@ -195,5 +195,23 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
 
 		return b;
 	}
-
+	
+	/**
+	 * return "" if argument is null
+	 * @param o
+	 * @return
+	 */
+	public static String nvl(Object o){
+		return o!=null?o.toString():"";
+	}
+	/**
+	 * return ds if argument is null
+	 * 
+	 * @param o
+	 * @param ds
+	 * @return
+	 */
+	public static String nvl(String o, String ds){
+		return o!=null?o.toString():ds;
+	}
 }

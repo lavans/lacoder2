@@ -331,18 +331,4 @@ public class DBManager{
 			}
 		}
 	}
-
-	/**
-	 * 物理切断。
-	 * すべてのコネクションプールを対象とする。
-	 *
-	 * @return
-	 */
-	public static int physicalClose() throws SQLException{
-		int result=0;
-		for(ConnectionPool pool: dbMap.values()){
-			result += pool.physicalClose();
-		}
-		return result;
-	}
 }
