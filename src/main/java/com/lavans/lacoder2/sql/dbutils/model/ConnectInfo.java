@@ -2,7 +2,6 @@ package com.lavans.lacoder2.sql.dbutils.model;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.val;
 
 import com.lavans.lacoder2.lang.PeriodUtils;
 import com.lavans.lacoder2.sql.dbutils.dbms.DbmsFactory;
@@ -36,9 +35,9 @@ public class ConnectInfo {
 		Config config = Config.getInstance(configFile);
 		type = DbmsType.valueOf(config.getNodeValue(sectionName+TYPE).toUpperCase());
 		DbmsUtils utils = DbmsFactory.getDbmsUtils(type);
-		val host = config.getNodeValue(sectionName + HOST);
-		val port = config.getNodeValueInt(sectionName + PORT, utils.getDefaultPort());
-		val name = config.getNodeValue(sectionName + NAME);
+		String host = config.getNodeValue(sectionName + HOST);
+		int port = config.getNodeValueInt(sectionName + PORT, utils.getDefaultPort());
+		String name = config.getNodeValue(sectionName + NAME);
 
 		poolName = sectionName;
 		driverName = utils.getDriverName();
