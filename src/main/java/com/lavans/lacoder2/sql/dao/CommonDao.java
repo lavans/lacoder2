@@ -19,6 +19,7 @@ import lombok.val;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.BeanUtilsBean;
+import org.apache.commons.beanutils.ConvertUtilsBean;
 import org.apache.commons.beanutils.Converter;
 import org.apache.commons.lang3.time.StopWatch;
 import org.slf4j.Logger;
@@ -304,11 +305,11 @@ public class CommonDao{
 		}
 	}
 	static{
-		val convertUtilsBean = BeanUtilsBean.getInstance().getConvertUtils();
-		val bigDecimalConverter = convertUtilsBean.lookup(BigDecimal.class);
+		ConvertUtilsBean convertUtilsBean = BeanUtilsBean.getInstance().getConvertUtils();
+		Converter bigDecimalConverter = convertUtilsBean.lookup(BigDecimal.class);
 		convertUtilsBean.register(new NullableConverter(bigDecimalConverter), BigDecimal.class);
 
-		val dateConverter = convertUtilsBean.lookup(Date.class);
+		Converter dateConverter = convertUtilsBean.lookup(Date.class);
 		convertUtilsBean.register(new NullableConverter(dateConverter), Date.class);
 	}
 }

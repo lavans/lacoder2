@@ -133,7 +133,7 @@ public class ConnectionPool{
 			throw new RuntimeException(MSG_ERR_TOOMANYCONNECTIONS + String.format("現在:%d, 最大:%d", sumSize(), connectInfo.getMax()));
 		}
 	}
-	
+
 	/**
 	 * DBへのコネクションチェック。
 	 * force_checkを再導入することでDB(postgres)を再起動したときにも
@@ -396,14 +396,14 @@ public class ConnectionPool{
 		}
 		return result;
 	}
-	
+
 	private ExecutorService executorService = Executors.newFixedThreadPool(1);
 	private void adjustConnections(){
 		logger.debug("call adjust");
 		executorService.execute(new Runnable() {
 			@Override
 			public void run() {
-				val delta = connectInfo.getSpare() - poolList.size();
+				int delta = connectInfo.getSpare() - poolList.size();
 				logger.debug(String.format("exec adjust[delta:%d, pool:%d, use:%d]",delta,poolList.size(), useList.size()));
 				for(int i=0; i<delta; i++){
 					if(sumSize()<connectInfo.getMax()){
