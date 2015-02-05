@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
 import org.slf4j.Logger;
 
 import com.lavans.lacoder2.di.BeanManager;
@@ -20,10 +19,6 @@ import com.lavans.lacoder2.sql.dbutils.model.Table;
 @Scope(Type.PROTOTYPE)
 public class OracleUtils implements DbmsUtils{
 	private static Logger logger = LogUtils.getLogger();
-	private String dbName;
-	public void setDbName(String dbName){
-		this.dbName = dbName;
-	}
 	/**
 	 * Retrn JDBC Drive class name.
 	 */
@@ -52,6 +47,11 @@ public class OracleUtils implements DbmsUtils{
 	public int getDefaultPort(){
 		return 1521;
 	}
+
+	@Override
+	public String getValidSql(){
+		return "SELECT sysdate FROM dual";
+	}
 	
 	private CommonDao dao = BeanManager.getBean(CommonDao.class);
 
@@ -59,8 +59,8 @@ public class OracleUtils implements DbmsUtils{
 	 * バージョンを返します。
 	 */
 	private static final String SQL_VERSION = "SELECT * FROM V$VERSION";
-	public String getVersion(){
-		List<Map<String, Object>> list = dao.executeQuery(SQL_VERSION, null, dbName);
+	public String getVersion(String name){
+		List<Map<String, Object>> list = dao.executeQuery(SQL_VERSION, null, name);
 		return list.get(0).get("BANNER").toString();
 	}
 
@@ -68,9 +68,9 @@ public class OracleUtils implements DbmsUtils{
 	 * テーブル名一覧を返します。
 	 */
 	private static final String SQL_TABLENAMES = "SELECT * FROM tab WHERE tabtype='TABLE' ORDER BY TNAME";
-	public List<String> getTableNames(){
+	public List<String> getTableNames(String name){
 		List<String> tableNames = new ArrayList<>();
-		List<Map<String, Object>> list = dao.executeQuery(SQL_TABLENAMES, null, dbName);
+		List<Map<String, Object>> list = dao.executeQuery(SQL_TABLENAMES, null, name);
 		for(Map<String, Object> map: list){
 			tableNames.add(map.get("TNAME").toString());
 		}
@@ -82,14 +82,14 @@ public class OracleUtils implements DbmsUtils{
 	 */
 	private static final String SQL_TABLE =
 			"SELECT * FROM USER_TAB_COLUMNS WHERE TABLE_NAME=:table order by column_id";
-	public Table getTable(String tableName){
+	public Table getTable(String name, String tableName){
 		Table table = new Table();
 		table.setName(tableName);
 		
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("table", tableName);
 		
-		List<Map<String, Object>> list = dao.executeQuery(SQL_TABLE, params, dbName);
+		List<Map<String, Object>> list = dao.executeQuery(SQL_TABLE, params, name);
 		for(Map<String, Object> map: list){
 			table.addColumn(makeTarget(map));
 		}

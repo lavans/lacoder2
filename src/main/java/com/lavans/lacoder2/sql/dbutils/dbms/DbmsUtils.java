@@ -12,11 +12,11 @@ public interface DbmsUtils {
 	String getDriverName();
 	String getUrl(String ip, int port, String name);
 	int getDefaultPort();
+	String getValidSql();
 	String makeLimitOffset(String sql, int limit, int offset);
 	
 	// SQL execute
-	void setDbName(String dbName);
-	String getVersion();
-	List<String> getTableNames();
-	Table getTable(String tableName);
+	String getVersion(String dbName);
+	List<String> getTableNames(String dbName);
+	Table getTable(String dbName, String tableName);
 }

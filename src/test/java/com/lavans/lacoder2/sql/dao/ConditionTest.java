@@ -4,9 +4,8 @@ import static org.testng.Assert.assertTrue;
 
 import java.util.Map;
 
-
+import org.junit.Test;
 import org.slf4j.Logger;
-import org.testng.annotations.Test;
 
 import com.lavans.lacoder2.lang.LogUtils;
 import com.lavans.lacoder2.sql.dao.Condition;

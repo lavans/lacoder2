@@ -19,10 +19,6 @@ import com.lavans.lacoder2.sql.dbutils.model.Table;
 @Scope(Type.PROTOTYPE)
 public class PostgresUtils implements DbmsUtils{
 	private static Logger logger = LogUtils.getLogger();
-	private String dbName;
-	public void setDbName(String dbName){
-		this.dbName = dbName;
-	}
 	/**
 	 * Retrn JDBC Drive class name.
 	 */
@@ -52,13 +48,18 @@ public class PostgresUtils implements DbmsUtils{
 		return 5432;
 	}
 
+	@Override
+	public String getValidSql(){
+		return "SELECT now()";
+	}
+
 	private CommonDao dao = BeanManager.getBean(CommonDao.class);
 
 	/**
 	 * バージョンを返します。
 	 */
 	private static final String SQL_VERSION = "SELECT version()";
-	public String getVersion(){
+	public String getVersion(String dbName){
 		List<Map<String, Object>> list = dao.executeQuery(SQL_VERSION, null, dbName);
 		return list.get(0).get("version").toString();
 	}
@@ -68,7 +69,7 @@ public class PostgresUtils implements DbmsUtils{
 	 */
 	private static final String SQL_TABLENAMES =
 			"select tablename from pg_tables where tablename not like 'pg_%' and tablename not like 'sql_%' order by tablename;";
-	public List<String> getTableNames(){
+	public List<String> getTableNames(String dbName){
 		List<String> tableNames = new ArrayList<>();
 		List<Map<String, Object>> list = dao.executeQuery(SQL_TABLENAMES, null, dbName);
 		for(Map<String, Object> map: list){
@@ -82,7 +83,7 @@ public class PostgresUtils implements DbmsUtils{
 	 */
 	private static final String SQL_TABLE =
 		"SELECT * FROM information_schema.columns WHERE table_name=:table"; // order by ordinal_position;
-	public Table getTable(String tableName){
+	public Table getTable(String dbName, String tableName){
 		Table table = new Table();
 		table.setName(tableName);
 

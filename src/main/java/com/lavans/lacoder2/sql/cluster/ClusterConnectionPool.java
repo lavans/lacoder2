@@ -13,13 +13,13 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Random;
 
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.lavans.lacoder2.sql.ConnectionPool;
 import com.lavans.lacoder2.sql.bind.BindConnection;
 import com.lavans.lacoder2.sql.bind.impl.BindConnectionImpl;
+import com.lavans.lacoder2.sql.dbutils.model.ConnectInfo;
 import com.lavans.lacoder2.sql.pool.PooledConnection;
 import com.lavans.lacoder2.sql.stats.StatsConnection;
 
@@ -47,9 +47,9 @@ public class ClusterConnectionPool extends ConnectionPool {
 	/**
 	 * コンストラクタ。
 	 **/
-	public ClusterConnectionPool(String driver, List<String> urlList, String user,String pass){
-		super(driver,"",user,pass);
-		this.urlList = urlList;
+	public ClusterConnectionPool(ConnectInfo info){
+		super(info);
+		// TODO add urlList to connectionInfo  this.urlList = urlList;
 		urlMap = new HashMap<Connection, String>(urlList.size());
 	}
 
@@ -57,23 +57,24 @@ public class ClusterConnectionPool extends ConnectionPool {
 	 * @see com.lavans.util.jdbc.ConnectionPool#createConnection()
 	 */
 	@Override
-	protected PooledConnection createConnection() throws SQLException {
-		// 最大数チェック
-		if((getPoolList().size() + getUseList().size()) >= getMaxConnections()){
-			throw new SQLException(MSG_ERR_TOOMANYCONNECTIONS, SQLSTATE_CONNECTION_EXCEPTION, ERR_CONNECTION_OVERFLOW);
-		}
+	protected PooledConnection createConnection(){
+		checkMaxCount();
 		Connection conn = createNativeConnection();
 
-		conn = new ClusterConnection(conn,this);
-		logger.debug(conn.getMetaData().getURL());
-		urlMap.put(conn,conn.getMetaData().getURL());	// コネクションと新しいurlのマッピングを行う。
+		try {
+	    conn = new ClusterConnection(conn,this);
+  	  logger.debug(conn.getMetaData().getURL());
+		  urlMap.put(conn,conn.getMetaData().getURL());	// コネクションと新しいurlのマッピングを行う。
+    } catch (SQLException e) {
+      throw new RuntimeException(e);
+    }
 
 		// StatsConnection,LoggingConnectionともにLoggableインターフェースの
 		// 実装とした。LoggableなConnectionの作成順序は入れ替え可能。
 		// Loggableを実装しないラッパークラスを作る場合はこれらの前にnewすること。
 
 		// 統計情報を収集するなら
-		if(isStatistics()){
+		if(connectInfo.isStats()){
 			conn = new StatsConnection(conn);
 		}
 
@@ -96,7 +97,7 @@ public class ClusterConnectionPool extends ConnectionPool {
 	 * @see createNativeConnection(String)
 	 * @return
 	 */
-	private Connection createNativeConnection() throws SQLException{
+	private Connection createNativeConnection() {
 		// ワーク用にURLリストをコピーして有効なurlを探索。
 		return createNativeConnection(new ArrayList<String>(urlList));
 	}
@@ -107,14 +108,14 @@ public class ClusterConnectionPool extends ConnectionPool {
 	 * urlをあらかじめ排除するため、接続先一覧を指定できるようにする。
 	 * @return
 	 */
-	private Connection createNativeConnection(List<String> workList) throws SQLException{
+	private Connection createNativeConnection(List<String> workList){
 		// from java.sql.DriverManager
 		Properties info = new Properties();
-		if (getConnectInfo().getUser() != null) {
-		    info.put("user", getConnectInfo().getUser());
+		if (connectInfo.getUser() != null) {
+		    info.put("user", connectInfo.getUser());
 		}
-		if (getConnectInfo().getPass() != null) {
-		    info.put("password", getConnectInfo().getPass());
+		if (connectInfo.getPass() != null) {
+		    info.put("password", connectInfo.getPass());
 		}
 
 		// 接続に失敗した場合はそのurlをワークリストから外して、
@@ -134,7 +135,7 @@ public class ClusterConnectionPool extends ConnectionPool {
 		}
 
 		// 有効なConnectionが見つからないままworkListが0になってしまったらエラー
-		throw new SQLException(MSG_ERR_NOCONNECT);
+		throw new RuntimeException(MSG_ERR_NOCONNECT);
 	}
 
 	/**

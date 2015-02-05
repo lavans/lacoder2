@@ -222,15 +222,14 @@ public class Config {
 	 * @throws XPathExpressionException
 	 */
 	public Node getNode(String xql){
-		Node element = null;
 		try {
 			synchronized (xpath) {
-				element = (Node)xpath.evaluate(xql, root, XPathConstants.NODE);
+				return (Node)xpath.evaluate(xql, root, XPathConstants.NODE);
 			}
 		} catch (XPathExpressionException e) {
-			e.printStackTrace();
+			logger.info("[" + xql + "] is not valid.", e);
+			return null;
 		}
-		return element;
 	}
 
 	/**
@@ -308,22 +307,9 @@ public class Config {
 	public long getNodeValueLong(String key, long defaultValue){
 		return getValueDefault(getNodeValue(key), defaultValue);
 	}
-
-//	public Object getNode(String xql,Object item, QName returnType) throws XPathExpressionException{
-//		Object result;
-//		synchronized (xpath) {
-//			result = xpath.evaluate(xql, item, XPathConstants.NODE);
-//		}
-//		return result;
-//	}
-//
-//	public Object getNodeAttribute(String xql,Object item, QName returnType) throws XPathExpressionException{
-//		Object result;
-//		synchronized (xpath) {
-//			result = xpath.evaluate(xql, item, XPathConstants.NODE);
-//		}
-//		return result;
-//	}
+	public boolean getNodeValueBoolean(String key){
+		return Boolean.parseBoolean(getNodeValue(key));
+	}
 
 	/**
 	 * Set node value.

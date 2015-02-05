@@ -12,7 +12,21 @@
   </server-group>
 
   <parameter name="debug" value="true" />
-
+  
+  <!-- database -->
+  <default>
+    <type>postgres</type>
+    <host>host</host>
+    <name>databasename</name>
+    <user>user</user>
+    <pass>password</pass>
+    <spare-connections>1</spare-connections>
+    <max-connections>50</max-connections>
+    <is-stats>true</is-stats>
+    <max-life>1m</max-life>
+  </default>
+  
+<!-- 
   <database statistics="true">
     <connection name="default">
       <driver>org.postgresql.Driver</driver>
@@ -22,7 +36,8 @@
       <logging>true</logging>
       <init-connections>1</init-connections>
       <max-connections>50</max-connections>
-      <!-- <valid_sql>select now()</valid_sql> -->
     </connection>
   </database>
+-->
+      <!-- <valid_sql>select now()</valid_sql> -->
 </root>

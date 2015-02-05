@@ -9,9 +9,13 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import lombok.val;
+
+import org.apache.commons.beanutils.PropertyUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.lavans.lacoder2.lang.ArrayUtils;
 import com.lavans.lacoder2.lang.DateUtils;
 import com.lavans.lacoder2.lang.StringUtils;
 import com.lavans.lacoder2.sql.dbutils.dbms.DbmsFactory;
@@ -143,18 +147,32 @@ public class DaoUtils {
 	 * @param builder
 	 */
 	private static void proccessCondition(Map.Entry<String, String[]> entry,Map<String, String[]> map, StringBuilder builder){
-		String key = entry.getKey();
+		String keyStr = entry.getKey();
 		// empty check
-		if((map.get(key)==null) || map.get(key).length==0 || StringUtils.isEmpty(map.get(key)[0])){
+		if((map.get(keyStr)==null) || map.get(keyStr).length==0 || StringUtils.isEmpty(map.get(keyStr)[0])){
 			return;
 		}
-		String keys[] = key.split("\\.");
+		val key = new Key(keyStr);
+		key.type.processCondition(keyStr, key.table+key.field, builder, map);
+	}
+	
+	private static class Key{
+		Key(String key){
+			val keys = key.split("\\.");
+			val len = keys.length;
+			val multi = DaoUtils.isMultiple(keys)?1:0;
+			field = toConst(keys[len-2-multi]);
+			val typeStr = toConst(keys[len-1-multi]);
+		  type = ConditionTypeEnum.valueOf(ConditionTypeEnum.class, typeStr);
+			table = len-3-multi>=0?keys[len-3-multi]+".":"";
+		}
+		final String field;
+		final ConditionTypeEnum type;
+		final String table;
 		// memeberId -> MEMBER_ID
-		String field = StringUtils.toUnderscore(keys[keys.length-2]).toUpperCase();
-		String typeStr = StringUtils.toUnderscore(keys[keys.length-1]).toUpperCase();
-		ConditionTypeEnum type = ConditionTypeEnum.valueOf(ConditionTypeEnum.class, typeStr);
-		String table = keys.length > 2 ?keys[keys.length-3]+".":"";
-		type.processCondition(key, table+field, builder, map);
+		String toConst(String s){
+			return StringUtils.toUnderscore(s).toUpperCase();
+		}
 	}
 
 	/**
@@ -211,6 +229,20 @@ public class DaoUtils {
 		}
 		return DbmsFactory.getDbmsUtils(dbmsType).makeLimitOffset(sql, cond.getLimit(),  cond.getOffset());
 	}
+	
+	/**
+	 * Call static "getAttributeInfo" method of entity.
+	 * @param obj
+	 * @return
+	 */
+//	private static Map<String, Class<?>> getAttributeInfo(Class<?> beanClass) {
+//		val descriptors =  PropertyUtils.getPropertyDescriptors(beanClass);
+//		val result = new HashMap<String, Class<?>>();
+//		for(val desc: descriptors){
+//			result.put(desc.getName(), desc.getPropertyType());
+//		}
+//		return result;
+//	}
 
 	/**
 	 * 検索条件をMap<String,String[]>からMap<String,Object>に変換。
@@ -250,12 +282,19 @@ public class DaoUtils {
 	 * @return
 	 */
 	private static String getAttributeName(String key) {
-		// "."がある場合は属性名は"."より前の部分(ex memberId.equal
-		if (key.contains(".")) {
-			String names[] = key.split("\\.");
-			return names[names.length - 2]; // 後ろから２つめ
+		if (!key.contains(".")) {
+			return key;
 		}
-		return key;
+		// "."がある場合は属性名は"."より前の部分(ex memberId.equal
+		val names = key.split("\\.");
+		val index = isMultiple(names)?3:2;
+		return names[names.length-index];
+	}
+
+	private static final String[] multipleWords = new String[]{"multiple","orFuzzySearch"};
+	private static boolean isMultiple(String names[]){
+		val name = names[names.length - 2]; // 後ろから２つめ
+		return ArrayUtils.contains(multipleWords, name) && name.length()>2;
 	}
 
 	/**

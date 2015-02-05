@@ -13,13 +13,18 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+import lombok.Getter;
+import lombok.val;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.lavans.lacoder2.lang.StringUtils;
-import com.lavans.lacoder2.sql.bind.BindConnection;
 import com.lavans.lacoder2.sql.bind.impl.BindConnectionImpl;
+import com.lavans.lacoder2.sql.dbutils.model.ConnectInfo;
+import com.lavans.lacoder2.sql.dbutils.model.Database;
 import com.lavans.lacoder2.sql.pool.PooledConnection;
 import com.lavans.lacoder2.sql.stats.ConnectionCounter;
 import com.lavans.lacoder2.sql.stats.StatsConnection;
@@ -39,10 +44,9 @@ public class ConnectionPool{
 	/**
 	 * DB接続情報
 	 */
-	private final ConnectInfo connectInfo;
-	public ConnectInfo getConnectInfo(){
-		return connectInfo;
-	}
+	protected final ConnectInfo connectInfo;
+	@Getter
+	private final Database database;
 
 	/**
 	 * NativeDriver.
@@ -51,18 +55,6 @@ public class ConnectionPool{
 	 * 実Driverインスタンスを持つ。
 	 */
 	private Driver driver = null;
-
-	/**
-	 * コネクション最大数。
-	 * デフォルトは10。lacoder.xmlのinit_connectionsで変更可能。
-	 */
-	private int max_connections  = 10;
-
-	/**
-	 * 初期コネクション数。
-	 * デフォルトは2。lacoder.xmlのinit_connectionsで変更可能。
-	 */
-	private int init_connections = 2;
 
 	/**
 	 * 空きコネクションリスト。
@@ -79,57 +71,24 @@ public class ConnectionPool{
 	private final ThreadLocal<PooledConnection> transactionList = new ThreadLocal<PooledConnection>();
 
 	protected static final String MSG_ERR_TOOMANYCONNECTIONS = "接続数が最大値を超えています。";
-	protected static final String SQLSTATE_CONNECTION_EXCEPTION = "08000";
-	public static final int ERR_CONNECTION_OVERFLOW = 1;
-
-	/**
-	 * 強制チェックフラグ。
-	 */
-	private boolean isForceCheck=false;
-	/**
-	 * 強制チェック用SQL。
-	 */
-	private String validSql=null;
-
-
-	/**
-	 * コンストラクタ。
-	 **/
-	public ConnectionPool(String driverName, String url,String user,String pass){
-		connectInfo = new ConnectInfo();
-		connectInfo.setDriverName(driverName);
-		connectInfo.setUrl(url);
-		connectInfo.setUser(user);
-		connectInfo.setPass(pass);
-	}
 
 	public ConnectionPool(ConnectInfo connectInfo){
+		this.database = new Database(connectInfo);
 		this.connectInfo = connectInfo;
-	}
-
-	/**
-	 * 接続数最大値設定
-	 **/
-	public void setMaxConnections(int value){
-		max_connections = value;
-	}
-
-	/**
-	 * 接続数初期値設定
-	 **/
-	public void setInitConnections(int value){
-		init_connections = value;
+		init();
 	}
 
 	/**
 	 * 初期化
 	 **/
-	public void init()
-		throws ClassNotFoundException,IllegalAccessException,InstantiationException, SQLException
-	{
-		driver = (Driver)Class.forName(connectInfo.getDriverName()).newInstance();
-		for(int i=0; i<init_connections; i++){
-			poolList.add(createConnection());
+	public void init(){
+		try {
+	    driver = (Driver)Class.forName(connectInfo.getDriverName()).newInstance();
+    } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+    	throw new RuntimeException("DB init failed." + connectInfo, e);
+    }
+		for(int i=0; i< connectInfo.getSpare(); i++){
+		  poolList.add(createConnection());
 		}
 	}
 
@@ -140,77 +99,61 @@ public class ConnectionPool{
 	 * ただし、DoSアタックによるスタックオーバーフローは避けられないので
 	 * 間違った設定ファイルのまま運用すべきでない。
 	 */
-	protected synchronized PooledConnection createConnection()
-	  throws SQLException
-	{
-		// from java.sql.DriverManager
+	protected synchronized PooledConnection createConnection() {
+		checkMaxCount();
+		logger.info("create "+ connectInfo.getUrl());
+
 		Properties info = new Properties();
-		if (connectInfo.getUser() != null) {
-		    info.put("user", connectInfo.getUser());
-		}
-		if (connectInfo.getPass() != null) {
-		    info.put("password", connectInfo.getPass());
-		}
+		info.put("user", connectInfo.getUser());
+		info.put("password", connectInfo.getPass());
 
-		// 最大数チェック
-		if((poolList.size() + useList.size()) >= max_connections){
-			throw new SQLException(MSG_ERR_TOOMANYCONNECTIONS, SQLSTATE_CONNECTION_EXCEPTION, ERR_CONNECTION_OVERFLOW);
-		}
-		Connection conn = null;
-		logger.info(connectInfo.toString());
+		Connection con= null;
 		try {
-			conn = driver.connect(connectInfo.getUrl(), info);
+			con= driver.connect(connectInfo.getUrl(), info);
 		} catch (SQLException e) {
-			throw e;
+			throw new RuntimeException(e);
 		}
 
-		// 統計情報を収集するならStatsConnectionでラップ
-		if(connectInfo.isStatistics()){
-			conn = new StatsConnection(conn);
+		// 統計情報を収集するなら
+		if(connectInfo.isStats()){
+			con= new StatsConnection(con);
 		}
+		val bcon = new BindConnectionImpl(con);
+		val pcon = new PooledConnection(this,bcon);
 
-		// BindConnectionでラップ
-		BindConnection bcon = new BindConnectionImpl(conn);
-
-		// Connection#close()で物理的に閉じずにDBManagerに
-		// 返却するためPooledConnectionでラップする。
-		// ConnectionPoolではなくDBManagerを通すのは
-		// 統計情報取得時に貸し出し管理を行うため。
-		PooledConnection pcon = new PooledConnection(this,bcon);
+		adjustConnections();
+		logger.info("create "+ connectInfo.getUrl());
 
 		return pcon;
 	}
 
+	protected void checkMaxCount(){
+		// 最大数チェック
+		if(sumSize() > connectInfo.getMax()){
+			throw new RuntimeException(MSG_ERR_TOOMANYCONNECTIONS + String.format("現在:%d, 最大:%d", sumSize(), connectInfo.getMax()));
+		}
+	}
+	
 	/**
 	 * DBへのコネクションチェック。
 	 * force_checkを再導入することでDB(postgres)を再起動したときにも
 	 * 自動で再接続出来る事を確認。
 	 */
-	protected boolean checkConnection(Connection conn)
-	{
-		boolean result = false;
+	protected boolean checkConnection(Connection conn){
 		Statement st = null;
-		//ResultSet rs = null;
-		try
-		{
+		try {
 			st = conn.createStatement();
-			if(isForceCheck){
-				st.executeQuery(validSql);
+			if(connectInfo.isCheck()){
+				st.executeQuery(database.getValidSql());
 			}
-
-			result = true;			// 例外がなければOK
+			return true;			// 例外がなければOK
 		}catch (SQLException e) {
 			// ここでキャッチしておかないとgetConnection()自身が
 			// 例外を生成してしまう。
 		}finally{
-			try{
-				st.close();
-				//rs.close();
-			}catch(Exception e){
-			}
+			try{ st.close(); }catch(Exception e){ }
 		}
-
-		return result;
+		return false;
 	}
 
 	/**
@@ -232,7 +175,7 @@ public class ConnectionPool{
 		conn = transactionList.get();
 		if(conn!=null){
 			// トランザクション中のカウント
-			if(connectInfo.isStatistics()){
+			if(connectInfo.isStats()){
 				ConnectionCounter.getInstance().getConnectionTran();
 			}
 			// 接続チェックはしない。トランザクション中にエラーになるようであれば
@@ -262,7 +205,7 @@ public class ConnectionPool{
 		if(logger.isDebugEnabled()) logger.debug(useList.toString());
 
 		// 接続状態管理をする場合 ----------------
-		if(connectInfo.isStatistics() && countStats){
+		if(connectInfo.isStats() && countStats){
 			ConnectionCounter.getInstance().getConnection();
 		}
 
@@ -287,7 +230,7 @@ public class ConnectionPool{
 		PooledConnection connTran = transactionList.get();
 		if(connTran==conn){
 			// トランザクション中のカウント
-			if(connectInfo.isStatistics()){
+			if(connectInfo.isStats()){
 				ConnectionCounter.getInstance().releaseConnectionTran();
 			}
 			// トランザクション中の場合はなにもしない
@@ -305,7 +248,7 @@ public class ConnectionPool{
 		}
 
 		// 接続状態管理をする場合 ----------------
-		if(connectInfo.isStatistics() && countStats){
+		if(connectInfo.isStats() && countStats){
 			ConnectionCounter.getInstance().releaseConnection();
 		}
 
@@ -321,7 +264,7 @@ public class ConnectionPool{
 	public void startTransaction() throws SQLException{
 		// すでにトランザクション中の場合
 		if(isTransaction()){
-			if(connectInfo.isStatistics()){
+			if(connectInfo.isStats()){
 				ConnectionCounter.getInstance().startTransactionTran();
 			}
 			return;
@@ -331,7 +274,7 @@ public class ConnectionPool{
 		conn.setAutoCommit(false);
 		transactionList.set(conn);
 		// 接続状態管理をする場合 ----------------
-		if(connectInfo.isStatistics()){
+		if(connectInfo.isStats()){
 			ConnectionCounter.getInstance().startTransaction();
 		}
 
@@ -345,7 +288,7 @@ public class ConnectionPool{
 		PooledConnection conn = transactionList.get();
 		if(conn==null){
 			// 接続状態管理をする場合 ----------------
-			if(connectInfo.isStatistics()){
+			if(connectInfo.isStats()){
 				ConnectionCounter.getInstance().commitNoTran();
 			}
 			// トランザクション中で無い場合
@@ -356,7 +299,7 @@ public class ConnectionPool{
 		transactionList.remove();
 		releaseConnection(conn, false);
 		// 接続状態管理をする場合 ----------------
-		if(connectInfo.isStatistics()){
+		if(connectInfo.isStats()){
 			ConnectionCounter.getInstance().commit();
 		}
 	}
@@ -369,7 +312,7 @@ public class ConnectionPool{
 		PooledConnection conn = transactionList.get();
 		if(conn==null){
 			// 接続状態管理をする場合 ----------------
-			if(connectInfo.isStatistics()){
+			if(connectInfo.isStats()){
 				ConnectionCounter.getInstance().rollbackNoTran();
 			}
 			// トランザクション中で無い場合
@@ -380,7 +323,7 @@ public class ConnectionPool{
 		transactionList.remove();
 		releaseConnection(conn, false);
 		// 接続状態管理をする場合 ----------------
-		if(connectInfo.isStatistics()){
+		if(connectInfo.isStats()){
 			ConnectionCounter.getInstance().rollback();
 		}
 	}
@@ -394,34 +337,6 @@ public class ConnectionPool{
 	}
 
 	/**
-	 * @param b
-	 */
-	public void setStatistics(boolean isStatistics) {
-		connectInfo.setStatistics(isStatistics);
-	}
-
-	/**
-	 * @return
-	 */
-//	public Log getLogger() {
-//		return logger;
-//	}
-
-	/**
-	 * @param logger
-	 */
-//	public void setLogger(Log logger) {
-//		ConnectionPool.logger = logger;
-//	}
-
-	/**
-	 * @return
-	 */
-	protected int getMaxConnections() {
-		return max_connections;
-	}
-
-	/**
 	 * @return
 	 */
 	protected Driver getDriver() {
@@ -431,44 +346,8 @@ public class ConnectionPool{
 	/**
 	 * @return
 	 */
-	protected List<PooledConnection> getPoolList() {
-		return poolList;
-	}
-
-	/**
-	 * @return
-	 */
-	protected boolean isStatistics() {
-		return connectInfo.isStatistics();
-	}
-
-	/**
-	 * @return
-	 */
-	protected List<PooledConnection> getUseList() {
-		return useList;
-	}
-
-	/**
-	 * @param validSql validSql を設定。
-	 */
-	public void setValidSql(String validSql) {
-		this.validSql = validSql;
-		if(!StringUtils.isEmpty(validSql)){
-			isForceCheck=true;
-		}
-	}
-	/**
-	 * @return isLogging を戻します。
-	 */
-	public boolean isLogging() {
-		return connectInfo.isLogging();
-	}
-	/**
-	 * @param isLogging isLogging を設定。
-	 */
-	public void setLogging(boolean isLogging) {
-		connectInfo.setLogging(isLogging);
+	protected boolean isStats() {
+		return connectInfo.isStats();
 	}
 
 	/**
@@ -516,5 +395,30 @@ public class ConnectionPool{
 			list.clear();
 		}
 		return result;
+	}
+	
+	private ExecutorService executorService = Executors.newFixedThreadPool(1);
+	private void adjustConnections(){
+		logger.debug("call adjust");
+		executorService.execute(new Runnable() {
+			@Override
+			public void run() {
+				val delta = connectInfo.getSpare() - poolList.size();
+				logger.debug(String.format("exec adjust[delta:%d, pool:%d, use:%d]",delta,poolList.size(), useList.size()));
+				for(int i=0; i<delta; i++){
+					if(sumSize()<connectInfo.getMax()){
+						poolList.add(createConnection());
+					}
+				}
+			}
+		});
+	}
+
+	protected int sumSize(){
+		return poolList.size() + useList.size();
+	}
+
+	public void close(){
+		executorService.shutdown();
 	}
 }
