@@ -6,6 +6,7 @@ import lombok.val;
 
 import com.lavans.lacoder2.lang.PeriodUtils;
 import com.lavans.lacoder2.sql.dbutils.dbms.DbmsFactory;
+import com.lavans.lacoder2.sql.dbutils.dbms.DbmsUtils;
 import com.lavans.lacoder2.sql.dbutils.enums.DbmsType;
 import com.lavans.lacoder2.util.Config;
 
@@ -34,11 +35,11 @@ public class ConnectInfo {
 		if(!sectionName.endsWith("/")) { sectionName+="/"; }
 		Config config = Config.getInstance(configFile);
 		type = DbmsType.valueOf(config.getNodeValue(sectionName+TYPE).toUpperCase());
-		val utils = DbmsFactory.getDbmsUtils(type);
+		DbmsUtils utils = DbmsFactory.getDbmsUtils(type);
 		val host = config.getNodeValue(sectionName + HOST);
 		val port = config.getNodeValueInt(sectionName + PORT, utils.getDefaultPort());
 		val name = config.getNodeValue(sectionName + NAME);
-	
+
 		poolName = sectionName;
 		driverName = utils.getDriverName();
 		url = utils.getUrl(host, port, name);
@@ -63,6 +64,6 @@ public class ConnectInfo {
 	private final int spare;
 	private final int max;
 	private final long maxLife;
-  /** コネクションプール名 */	
+  /** コネクションプール名 */
 	private final String poolName;
 }
