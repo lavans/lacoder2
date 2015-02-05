@@ -11,7 +11,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import lombok.val;
 
-import org.apache.commons.beanutils.PropertyUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -152,14 +151,14 @@ public class DaoUtils {
 		if((map.get(keyStr)==null) || map.get(keyStr).length==0 || StringUtils.isEmpty(map.get(keyStr)[0])){
 			return;
 		}
-		val key = new Key(keyStr);
+		Key key = new Key(keyStr);
 		key.type.processCondition(keyStr, key.table+key.field, builder, map);
 	}
-	
+
 	private static class Key{
 		Key(String key){
-			val keys = key.split("\\.");
-			val len = keys.length;
+			String keys[] = key.split("\\.");
+			int len = keys.length;
 			val multi = DaoUtils.isMultiple(keys)?1:0;
 			field = toConst(keys[len-2-multi]);
 			val typeStr = toConst(keys[len-1-multi]);
@@ -229,7 +228,7 @@ public class DaoUtils {
 		}
 		return DbmsFactory.getDbmsUtils(dbmsType).makeLimitOffset(sql, cond.getLimit(),  cond.getOffset());
 	}
-	
+
 	/**
 	 * Call static "getAttributeInfo" method of entity.
 	 * @param obj

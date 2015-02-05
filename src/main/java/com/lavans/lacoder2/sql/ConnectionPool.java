@@ -17,11 +17,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import lombok.Getter;
-import lombok.val;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.lavans.lacoder2.sql.bind.BindConnection;
 import com.lavans.lacoder2.sql.bind.impl.BindConnectionImpl;
 import com.lavans.lacoder2.sql.dbutils.model.ConnectInfo;
 import com.lavans.lacoder2.sql.dbutils.model.Database;
@@ -118,8 +118,8 @@ public class ConnectionPool{
 		if(connectInfo.isStats()){
 			con= new StatsConnection(con);
 		}
-		val bcon = new BindConnectionImpl(con);
-		val pcon = new PooledConnection(this,bcon);
+		BindConnection bcon = new BindConnectionImpl(con);
+		PooledConnection pcon = new PooledConnection(this,bcon);
 
 		adjustConnections();
 		logger.info("create "+ connectInfo.getUrl());
