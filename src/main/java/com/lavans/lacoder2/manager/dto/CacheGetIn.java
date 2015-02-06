@@ -1,6 +1,8 @@
 package com.lavans.lacoder2.manager.dto;
 
-public class CacheGetIn {
+import java.io.Serializable;
+
+public class CacheGetIn implements Serializable{
 	private String cacheName;
 
 	public String getCacheName() {

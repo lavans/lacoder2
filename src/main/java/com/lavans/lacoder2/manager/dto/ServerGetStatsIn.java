@@ -1,4 +1,6 @@
 package com.lavans.lacoder2.manager.dto;
 
-public class ServerGetStatsIn {
+import java.io.Serializable;
+
+public class ServerGetStatsIn implements Serializable{
 }

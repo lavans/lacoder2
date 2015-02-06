@@ -2,6 +2,7 @@ package com.lavans.lacoder2.sql.dbutils.model;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.val;
 
 import com.lavans.lacoder2.lang.PeriodUtils;
 import com.lavans.lacoder2.sql.dbutils.dbms.DbmsFactory;
@@ -30,8 +31,8 @@ public class ConnectInfo {
 	private static final String MAX="max-connections";
 	private static final String MAX_LIFE="max-life";
 
-	public ConnectInfo(String configFile, String sectionName){
-		if(!sectionName.endsWith("/")) { sectionName+="/"; }
+	public ConnectInfo(String configFile, String poolName){
+		val sectionName = poolName.endsWith("/")?poolName:poolName+"/";
 		Config config = Config.getInstance(configFile);
 		type = DbmsType.valueOf(config.getNodeValue(sectionName+TYPE).toUpperCase());
 		DbmsUtils utils = DbmsFactory.getDbmsUtils(type);
@@ -39,7 +40,7 @@ public class ConnectInfo {
 		int port = config.getNodeValueInt(sectionName + PORT, utils.getDefaultPort());
 		String name = config.getNodeValue(sectionName + NAME);
 
-		poolName = sectionName;
+		this.poolName = poolName;
 		driverName = utils.getDriverName();
 		url = utils.getUrl(host, port, name);
 		user = config.getNodeValue(sectionName + USER);
