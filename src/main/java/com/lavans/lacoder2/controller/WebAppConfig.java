@@ -113,7 +113,7 @@ public class WebAppConfig {
 		// get filter map
 		List<String> filterNames = config.getNodeValueList(CONFIG_FILTER);
 		for(String filterName: filterNames){
-			Class<? extends ActionFilter> filter = BeanManager.getBeanClass(filterName);
+			Class<? extends ActionFilter> filter = BeanManager.getBeanClass(filterName.trim());
 			allFilterList.add(filter);
 			logger.info("allFilter:"+filter.getName());
 		}
