@@ -367,12 +367,10 @@ public class Config {
 	 * @throws IOException
 	 */
 	public void save(){
+		if(isReadOnly){
+			throw new RuntimeException("Xml file is readonly. It is in jar file.");
+		}
 		try {
-
-			if(isReadOnly){
-				throw new IOException("Xml file is readonly. It is in jar file.");
-			}
-
 			FileOutputStream fos = new FileOutputStream(configFileName);
 			//LSOutput に出力ストリームをセットする
 			lsOutput.setByteStream(fos);
