@@ -26,6 +26,8 @@ public class DefaultExceptionHandler implements ExceptionHandler{
 	public void handle(HttpServletRequest request, HttpServletResponse response, Throwable t) throws ServletException,
 			IOException {
 		logger.error(ErrorUtils.getRequestDetailString(request), t);
+		if(response.isCommitted()) return;
+
 		request.setAttribute("exception", t);
 		request.getServletContext().getRequestDispatcher("/WEB-INF/jsp/error/error.jsp").forward(request, response);
 	}
