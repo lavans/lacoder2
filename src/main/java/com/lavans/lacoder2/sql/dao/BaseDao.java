@@ -397,6 +397,11 @@ public class BaseDao{
 		return result;
 	}
 
+	public <T> int createTable(Class<T> clazz){
+		String sql = getSql(clazz, "createTable");
+		return dao.executeUpdate(sql);
+	}
+
 	/**
 	 * convert FQDN class name to base xml file name.
 	 * com.lavans.lacoder.Test -> com.lavans.lacoder.base.TestBase
