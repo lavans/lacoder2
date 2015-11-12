@@ -18,6 +18,7 @@ import java.sql.SQLXML;
 import java.sql.Savepoint;
 import java.sql.Statement;
 import java.sql.Struct;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -26,8 +27,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.Executor;
 
-import lombok.Getter;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,6 +34,9 @@ import com.lavans.lacoder2.sql.ConnectionPool;
 import com.lavans.lacoder2.sql.bind.BindCallableStatement;
 import com.lavans.lacoder2.sql.bind.BindConnection;
 import com.lavans.lacoder2.sql.bind.BindPreparedStatement;
+
+import lombok.Getter;
+import lombok.val;
 
 
 /**
@@ -57,10 +59,30 @@ public class PooledConnection implements BindConnection {
 	private BindConnection con=null;
 	private ConnectionPool pool = null;
 
+	/** 有効期限 */
+	private long expire;
+	/** 有効期限が切れているか判定します */
+	public boolean isExpired(){
+		return expire<System.currentTimeMillis();
+	}
+
 	/** close()時にすべてのStatementを自動的に閉じる。 */
 	private final List<PooledStatement> statementList = Collections.synchronizedList(new ArrayList<PooledStatement>());
 
 	@Getter private Date lastAccessTime;
+
+	/**
+	 * コンストラクタ
+	 */
+	public PooledConnection(ConnectionPool pool, BindConnection bcon) {
+		this.pool = pool;
+		this.con = bcon;
+		expire=System.currentTimeMillis()+pool.getConnectInfo().getMaxLife();
+		if(logger.isDebugEnabled()){
+			val sdf = new SimpleDateFormat("HH:mm:ss.SSS");
+			logger.debug("now:" + sdf.format(new Date()) + ", expire: " + sdf.format(new Date(expire)));
+		}
+	}
 
 	@Override
 	public String toString(){
@@ -121,14 +143,6 @@ public class PooledConnection implements BindConnection {
 
 	public BindConnection getRealConnection(){
 		return con;
-	}
-
-	/**
-	 *
-	 */
-	public PooledConnection(ConnectionPool pool, BindConnection bcon) {
-		this.pool = pool;
-		this.con = bcon;
 	}
 
 	/**

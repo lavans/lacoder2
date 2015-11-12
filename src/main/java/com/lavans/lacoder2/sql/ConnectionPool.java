@@ -16,8 +16,6 @@ import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import lombok.Getter;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,6 +26,8 @@ import com.lavans.lacoder2.sql.dbutils.model.Database;
 import com.lavans.lacoder2.sql.pool.PooledConnection;
 import com.lavans.lacoder2.sql.stats.ConnectionCounter;
 import com.lavans.lacoder2.sql.stats.StatsConnection;
+
+import lombok.Getter;
 
 /**
  * ConnectionPool。
@@ -44,6 +44,7 @@ public class ConnectionPool{
 	/**
 	 * DB接続情報
 	 */
+	@Getter
 	protected final ConnectInfo connectInfo;
 	@Getter
 	private final Database database;
@@ -121,7 +122,6 @@ public class ConnectionPool{
 		BindConnection bcon = new BindConnectionImpl(con);
 		PooledConnection pcon = new PooledConnection(this,bcon);
 
-		adjustConnections();
 		logger.info("create "+ connectInfo.getUrl());
 
 		return pcon;
@@ -132,6 +132,17 @@ public class ConnectionPool{
 		if(sumSize() > connectInfo.getMax()){
 			throw new RuntimeException(MSG_ERR_TOOMANYCONNECTIONS + String.format("現在:%d, 最大:%d", sumSize(), connectInfo.getMax()));
 		}
+	}
+
+	/**
+	 * DBへのコネクションチェック。
+	 */
+	protected boolean checkPooledConnection(PooledConnection conn) throws SQLException{
+//		logger.info("connectInfo.getMaxLifeMills "+ connectInfo.getMaxLifeMills() +"isExpired"+con.isExpired());
+		if(connectInfo.getMaxLife()>0 && conn.isExpired()){
+			return false;
+		}
+		return checkConnection(conn);
 	}
 
 	/**
@@ -148,6 +159,7 @@ public class ConnectionPool{
 			}
 			return true;			// 例外がなければOK
 		}catch (SQLException e) {
+			logger.debug("create statement failed", e);
 			// ここでキャッチしておかないとgetConnection()自身が
 			// 例外を生成してしまう。
 		}finally{
@@ -187,7 +199,7 @@ public class ConnectionPool{
 		synchronized(poolList){
 			if(poolList.size()>0){			// プールがあれば
 				conn=poolList.remove(0);	//
-				if(!checkConnection(conn)){		// 接続失敗したら
+				if(!checkPooledConnection(conn)){		// 接続失敗したら
 					try{
 						conn.getRealConnection().close();
 					}catch(Exception e){
@@ -209,13 +221,15 @@ public class ConnectionPool{
 			ConnectionCounter.getInstance().getConnection();
 		}
 
+		adjustConnections();
+
 		return conn;
 	}
 
 	/**
 	 * DBへのコネクション返却
 	 */
-	public void releaseConnection(Connection conn) throws SQLException{
+	public void releaseConnection(PooledConnection conn) throws SQLException{
 		releaseConnection(conn, true);
 	}
 	/**
@@ -225,7 +239,7 @@ public class ConnectionPool{
 	 * @param countStats StatsでgetConnection()をカウントするかどうか。commit/rollback()からはカウントしない。
 	 * @throws SQLException
 	 */
-	private void releaseConnection(Connection conn, boolean countStats) throws SQLException{
+	private void releaseConnection(PooledConnection conn, boolean countStats) throws SQLException{
 		// トランザクション中かどうかチェック
 		PooledConnection connTran = transactionList.get();
 		if(connTran==conn){
@@ -252,7 +266,19 @@ public class ConnectionPool{
 			ConnectionCounter.getInstance().releaseConnection();
 		}
 
-		poolList.add((PooledConnection)conn);
+		// コネクション無効
+		if(connectInfo.getMaxLife()>0 && conn.isExpired()){
+			conn.physicalClose();
+			adjustConnections();
+		}else if(poolList.size()>=connectInfo.getSpare()){
+			// スペアが十分にある場合
+			conn.physicalClose();
+		}else{
+			// コネクション返却
+			poolList.add(conn);
+		}
+
+		poolList.add(conn);
 	}
 
 	/**
@@ -399,16 +425,20 @@ public class ConnectionPool{
 
 	private ExecutorService executorService = Executors.newFixedThreadPool(1);
 	private void adjustConnections(){
-		logger.debug("call adjust");
+		logger.debug(String.format("call adjust pool%d, use%d, spare%d, max%d",
+				poolList.size(), useList.size(), connectInfo.getSpare(), connectInfo.getMax()));
 		executorService.execute(new Runnable() {
+			private boolean needsSpare(){
+				return poolList.size() < connectInfo.getSpare();
+			}
+			private boolean hasMaxConnections(){
+				return (poolList.size() + useList.size())>=connectInfo.getMax();
+			}
+
 			@Override
 			public void run() {
-				int delta = connectInfo.getSpare() - poolList.size();
-				logger.debug(String.format("exec adjust[delta:%d, pool:%d, use:%d]",delta,poolList.size(), useList.size()));
-				for(int i=0; i<delta; i++){
-					if(sumSize()<connectInfo.getMax()){
-						poolList.add(createConnection());
-					}
+				while(needsSpare() && !hasMaxConnections()){
+					poolList.add(createConnection());
 				}
 			}
 		});

@@ -1,14 +1,14 @@
 package com.lavans.lacoder2.sql.dbutils.model;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.val;
-
 import com.lavans.lacoder2.lang.PeriodUtils;
 import com.lavans.lacoder2.sql.dbutils.dbms.DbmsFactory;
 import com.lavans.lacoder2.sql.dbutils.dbms.DbmsUtils;
 import com.lavans.lacoder2.sql.dbutils.enums.DbmsType;
 import com.lavans.lacoder2.util.Config;
+
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.val;
 
 /**
  * DB接続情報。sql.ConnectInfoの拡張。
@@ -20,6 +20,7 @@ import com.lavans.lacoder2.util.Config;
 @EqualsAndHashCode
 public class ConnectInfo {
 	private static final String TYPE="type";
+	private static final String URL="url";
 	private static final String HOST="host";
 	private static final String PORT="port";
 	private static final String NAME="name";
@@ -39,10 +40,11 @@ public class ConnectInfo {
 		String host = config.getNodeValue(sectionName + HOST);
 		int port = config.getNodeValueInt(sectionName + PORT, utils.getDefaultPort());
 		String name = config.getNodeValue(sectionName + NAME);
+		String assignedUrl = config.getNodeValue(sectionName + URL);
 
 		this.poolName = poolName;
 		driverName = utils.getDriverName();
-		url = utils.getUrl(host, port, name);
+		url = assignedUrl.isEmpty()?utils.getUrl(host, port, name):assignedUrl;
 		user = config.getNodeValue(sectionName + USER);
 		pass = config.getNodeValue(sectionName + PASS);
 		isStats = config.getNodeValueBoolean(sectionName + IS_STATS);

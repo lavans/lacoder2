@@ -25,10 +25,10 @@ public class OracleUtils implements DbmsUtils{
 	public String getDriverName(){
 		return "oracle.jdbc.OracleDriver";
 	}
-	
+
 	/**
 	 * Return JDBC Connection String.
-	 * 
+	 *
 	 * @param ip
 	 * @param port
 	 * @param name
@@ -40,7 +40,7 @@ public class OracleUtils implements DbmsUtils{
 				.replace("$port", String.valueOf(port))
 				.replace("$name", name);
 	}
-	
+
 	/**
 	 * Return default database port.
 	 */
@@ -52,7 +52,7 @@ public class OracleUtils implements DbmsUtils{
 	public String getValidSql(){
 		return "SELECT sysdate FROM dual";
 	}
-	
+
 	private CommonDao dao = BeanManager.getBean(CommonDao.class);
 
 	/**
@@ -76,7 +76,7 @@ public class OracleUtils implements DbmsUtils{
 		}
 		return tableNames;
 	}
-	
+
 	/**
 	 * テーブル情報を返します。
 	 */
@@ -85,17 +85,17 @@ public class OracleUtils implements DbmsUtils{
 	public Table getTable(String name, String tableName){
 		Table table = new Table();
 		table.setName(tableName);
-		
+
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("table", tableName);
-		
+
 		List<Map<String, Object>> list = dao.executeQuery(SQL_TABLE, params, name);
 		for(Map<String, Object> map: list){
 			table.addColumn(makeTarget(map));
 		}
 		return table;
 	}
-	
+
 	private Column makeTarget(Map<String, Object> map){
 		logger.info(map.toString());
 		Column column = new Column();
@@ -109,7 +109,7 @@ public class OracleUtils implements DbmsUtils{
 		column.setNullable(map.get("NULLABLE").equals("Y")?true:false);
 		return column;
 	}
-	
+
 	/**
 	 * DBのTYPEからJavaのTypeを返す
 	 * @return
@@ -123,7 +123,7 @@ public class OracleUtils implements DbmsUtils{
 		}
 		return "String";
 	}
-	
+
 	/** LIMIT OFFSET用 start*/
 	private static final String LIMIT_ORACLE_START=
 			"SELECT * FROM (SELECT A.*, ROWNUM AS NUM FROM (\n  ";
@@ -143,5 +143,5 @@ public class OracleUtils implements DbmsUtils{
 				+ LIMIT_ORACLE_END.replace(":_start", start).replace(":_end", end);
 		return sql;
 	}
-	
+
 }
