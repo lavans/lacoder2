@@ -139,9 +139,9 @@ public class ConnectionPool{
 	 */
 	protected boolean checkPooledConnection(PooledConnection conn) throws SQLException{
 //		logger.info("connectInfo.getMaxLifeMills "+ connectInfo.getMaxLifeMills() +"isExpired"+con.isExpired());
-		if(connectInfo.getMaxLife()>0 && conn.isExpired()){
-			return false;
-		}
+//		if(connectInfo.getMaxLife()>0 && conn.isExpired()){
+//			return false;
+//		}
 		return checkConnection(conn);
 	}
 
