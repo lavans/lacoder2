@@ -277,8 +277,6 @@ public class ConnectionPool{
 			// コネクション返却
 			poolList.add(conn);
 		}
-
-		poolList.add(conn);
 	}
 
 	/**
