@@ -3,6 +3,7 @@ package com.lavans.lacoder2.lang;
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 public class JapaneseTextUtils {
 	/**
@@ -222,16 +223,12 @@ public class JapaneseTextUtils {
 		put((char)0x2015,(char)0x2014); // — HORIZONTAL BAR					-> EM DASH
 	}};
 	@SuppressWarnings("serial")
-	private static Map<Character, Character> cp932Map = new HashMap<Character, Character>(){{
-		put((char)0x005c,(char)0xff3c); // ＼ REVERSE SOLIDUS		-> FULLWIDTH REVERSE SOLIDUS
-		put((char)0x301c,(char)0xff5e); // ～ WAVE DASH				-> FULLWIDTH TILDE
-		put((char)0x2016,(char)0x2225); // ‖ DOUBLE VERTICAL LINE -> PARALLEL TO
-		put((char)0x2212,(char)0xff0d); // − MINUS SIGN				-> FULLWIDTH HYPHEN-MINUS
-		put((char)0x00a2,(char)0xffe0); // ¢ CENT SIGN				-> FULLWIDTH CENT SIGN
-		put((char)0x00a3,(char)0xffe1); // £ POUND SIGN				-> FULLWIDTH POUND SIGN
-		put((char)0x00ac,(char)0xffe2); // ¬ NOT SIGN				-> FULLWIDTH NOT SIGN
-		put((char)0x2014,(char)0x2015); // — EM DASH					-> HORIZONTAL BAR
-	}};
+	private static Map<Character, Character> cp932Map = new HashMap<Character, Character>();
+	static{
+		for(Entry<Character, Character> e: jisMap.entrySet()){
+			cp932Map.put(e.getValue(), e.getKey());
+		}
+	}
 	/**
 	 *  convert Cp932 to JIS.
 	 * @param s

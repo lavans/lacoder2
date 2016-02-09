@@ -13,8 +13,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
+import lombok.Getter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,8 +29,6 @@ import com.lavans.lacoder2.sql.dbutils.model.Database;
 import com.lavans.lacoder2.sql.pool.PooledConnection;
 import com.lavans.lacoder2.sql.stats.ConnectionCounter;
 import com.lavans.lacoder2.sql.stats.StatsConnection;
-
-import lombok.Getter;
 
 /**
  * ConnectionPool。
@@ -82,14 +83,14 @@ public class ConnectionPool{
 	/**
 	 * 初期化
 	 **/
-	public void init(){
+	public void init() {
 		try {
-	    driver = (Driver)Class.forName(connectInfo.getDriverName()).newInstance();
-    } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
-    	throw new RuntimeException("DB init failed." + connectInfo, e);
-    }
-		for(int i=0; i< connectInfo.getSpare(); i++){
-		  poolList.add(createConnection());
+			driver = (Driver) Class.forName(connectInfo.getDriverName()).newInstance();
+		} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+			throw new RuntimeException("DB init failed." + connectInfo, e);
+		}
+		for (int i = 0; i < connectInfo.getMinSpare(); i++) {
+			poolList.add(createConnection());
 		}
 	}
 
@@ -138,10 +139,10 @@ public class ConnectionPool{
 	 * DBへのコネクションチェック。
 	 */
 	protected boolean checkPooledConnection(PooledConnection conn) throws SQLException{
-//		logger.info("connectInfo.getMaxLifeMills "+ connectInfo.getMaxLifeMills() +"isExpired"+con.isExpired());
-//		if(connectInfo.getMaxLife()>0 && conn.isExpired()){
-//			return false;
-//		}
+		logger.debug("connectInfo.getMaxLifeMills "+ connectInfo.getMaxLife() +"isExpired"+conn.isExpired());
+		if(connectInfo.getMaxLife()>0 && conn.isExpired()){
+			return false;
+		}
 		return checkConnection(conn);
 	}
 
@@ -196,17 +197,10 @@ public class ConnectionPool{
 		}
 
 		// 空きプールから捜す
-		synchronized(poolList){
-			if(poolList.size()>0){			// プールがあれば
-				conn=poolList.remove(0);	//
-				if(!checkPooledConnection(conn)){		// 接続失敗したら
-					try{
-						conn.getRealConnection().close();
-					}catch(Exception e){
-					}
-					conn=null;
-				}
-			}
+		conn = detach(poolList);
+		if(!checkPooledConnection(conn)){		// 接続失敗したら切断処理をしておく。
+			try{ conn.getRealConnection().close(); }catch(Exception e){ }
+			conn=null;
 		}
 
 		if(conn==null){
@@ -224,6 +218,21 @@ public class ConnectionPool{
 		adjustConnections();
 
 		return conn;
+	}
+
+	/**
+	 * リストをロックして一つ目の要素を返します。
+	 *
+	 * @param src
+	 * @return リストが空ならnull
+	 */
+	private <T> T detach(List<T> src){
+		synchronized(src){
+			if(src.size()>0){
+				return src.remove(0);
+			}
+		}
+		return null;
 	}
 
 	/**
@@ -270,7 +279,7 @@ public class ConnectionPool{
 		if(connectInfo.getMaxLife()>0 && conn.isExpired()){
 			conn.physicalClose();
 			adjustConnections();
-		}else if(poolList.size()>=connectInfo.getSpare()){
+		}else if(poolList.size()>=connectInfo.getMaxSpare()){
 			// スペアが十分にある場合
 			conn.physicalClose();
 		}else{
@@ -421,13 +430,13 @@ public class ConnectionPool{
 		return result;
 	}
 
-	private ExecutorService executorService = Executors.newFixedThreadPool(1);
+	private ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
 	private void adjustConnections(){
 		logger.debug(String.format("call adjust pool%d, use%d, spare%d, max%d",
-				poolList.size(), useList.size(), connectInfo.getSpare(), connectInfo.getMax()));
-		executorService.execute(new Runnable() {
+				poolList.size(), useList.size(), connectInfo.getMinSpare(), connectInfo.getMax()));
+		executorService.schedule(new Runnable() {
 			private boolean needsSpare(){
-				return poolList.size() < connectInfo.getSpare();
+				return poolList.size() < connectInfo.getMinSpare();
 			}
 			private boolean hasMaxConnections(){
 				return (poolList.size() + useList.size())>=connectInfo.getMax();
@@ -436,10 +445,11 @@ public class ConnectionPool{
 			@Override
 			public void run() {
 				while(needsSpare() && !hasMaxConnections()){
+					logger.info("pool" + poolList.size() + "use:" + useList.size());
 					poolList.add(createConnection());
 				}
 			}
-		});
+		}, 1, TimeUnit.SECONDS);
 	}
 
 	protected int sumSize(){

@@ -11,7 +11,7 @@ import com.lavans.lacoder2.sql.dbutils.dbms.DbmsUtils;
 public class Database {
 	private final DbmsUtils dbmsUtils;
 	private final String name;
-	
+
 	public Database(ConnectInfo connectInfo){
 		name = connectInfo.getPoolName();
 		dbmsUtils = DbmsFactory.getDbmsUtils(connectInfo.getType());
@@ -25,13 +25,13 @@ public class Database {
 	}
 
 	public String getValidSql(){
-		return dbmsUtils.getVersion(name);
+		return dbmsUtils.getValidSql();
 	}
-	
+
 	public String getVersion(){
 		return dbmsUtils.getVersion(name);
 	}
-	
+
 	/**
 	 * テーブル名一覧取得
 	 * @return
@@ -39,7 +39,7 @@ public class Database {
 	public List<String> getTableNames(){
 		return dbmsUtils.getTableNames(name);
 	}
-	
+
 	public Table getTable(String tableName){
 		return dbmsUtils.getTable(name, tableName);
 	}
