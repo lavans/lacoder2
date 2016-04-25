@@ -198,7 +198,7 @@ public class ConnectionPool{
 
 		// 空きプールから捜す
 		conn = detach(poolList);
-		if(!checkPooledConnection(conn)){		// 接続失敗したら切断処理をしておく。
+		if(conn!=null && !checkPooledConnection(conn)){		// 接続失敗したら切断処理をしておく。
 			try{ conn.getRealConnection().close(); }catch(Exception e){ }
 			conn=null;
 		}
