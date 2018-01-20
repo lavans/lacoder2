@@ -17,7 +17,7 @@ import com.lavans.lacoder2.remote.node.ServerNode;
 /**
  * 自ノード以外への接続。
  * 管理Serverが別になるならいらないかも。
- * 
+ *
  * @author sbisec
  *
  */
@@ -44,14 +44,14 @@ public class AllSelector implements Selector{
 				logger.warn(e.getMessage());
 				// 接続に失敗したらofflineにする。
 				node.setOffline();
-				ServerGroup.save();
+//				ServerGroup.save(); // TODO lacoder2.xmlが消えてしまうことがあるのでコメントアウト
 			}
 		}
 		return list;
 	}
 	/**
 	 * Server一覧を返します。
-	 * 
+	 *
 	 * @param group 現在有効なServerNode一覧
 	 */
 	protected List<ServerNode> getServerList(ServerGroup group){

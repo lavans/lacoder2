@@ -7,7 +7,6 @@ import java.util.SortedSet;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
@@ -114,6 +113,7 @@ public class ServerGroup implements Comparable<ServerGroup>{
 	private static final String XQUERY_NODE =
 			"server-group[@name='$group']/server-node[@name='$node']";
 	public static void save(){
+		// TODO lacoder2.xmlが消えてしまうことがある。要検証。
 		Config config = Config.getInstance(Config.CONFIG_FILE);
 		for(ServerGroup group: groupMap.values()){
 			for(ServerNode node: group.nodeList){

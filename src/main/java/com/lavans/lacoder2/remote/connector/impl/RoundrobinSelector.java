@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-
 import org.slf4j.Logger;
 
 import com.lavans.lacoder2.di.annotation.Scope;
@@ -46,7 +45,7 @@ public class RoundrobinSelector implements Selector{
 				// 接続に失敗したらofflineにする。
 				node.setOffline();
 				nodeList.remove(node);
-				ServerGroup.save();
+//				ServerGroup.save(); // TODO lacoder2.xmlが消えてしまうことがあるのでコメントアウト
 			}
 		}
 		// 有効な接続先がなければRuntimeException
