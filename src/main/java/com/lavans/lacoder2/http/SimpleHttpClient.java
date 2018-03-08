@@ -16,6 +16,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.zip.GZIPInputStream;
 
 import javax.net.ssl.HostnameVerifier;
@@ -52,11 +54,7 @@ import com.lavans.lacoder2.util.ParameterUtils;
  * String content = response.getContentes
  * }</pre>
  *
- * TODO Post binary with "multipart/form-data"
- * http://blog.oklab.org/?p=136
- *
  * @author dobashi
- *
  */
 @Scope(Type.PROTOTYPE)
 public class SimpleHttpClient {
@@ -89,7 +87,6 @@ public class SimpleHttpClient {
 
 	/**
 	 * Simple Get. Convenience method.
-	 * @param 接続先URL。
 	 * @return 取得したコンテンツ。
 	 * @throws RuntimeException IOExceptionが発生した場合。
 	 */
@@ -161,7 +158,6 @@ public class SimpleHttpClient {
 
 	/**
 	 * Set connection parameters
-	 * @param con
 	 */
 	private void setConnectionOption() {
 		try {
@@ -196,12 +192,19 @@ public class SimpleHttpClient {
 		}
 
 		// POSTの時
-		if(output!=null){
-			doPost(con);
-		}
+		ifNotNullDo(output, x -> doPost(con));
+
 		try(InputStream is = getInputStream(con)){
 			return makeResponse(con,is);
 		}
+	}
+
+	private <T, R> R ifNotNullDo(T s, R nullValue, Function<T, R> f) {
+		return s == null ? nullValue : f.apply(s);
+	}
+
+	private <T> void ifNotNullDo(T s, Consumer<T> f) {
+		if (s != null) f.accept(s);
 	}
 
 	/**
@@ -242,13 +245,14 @@ public class SimpleHttpClient {
 	/**
 	 * POSTデータ処理
 	 * @param con
-	 * @param os
 	 * @throws IOException
 	 */
-	private void doPost(URLConnection con) throws IOException{
+	private void doPost(URLConnection con){
 		try(PrintStream os = new PrintStream(con.getOutputStream())){
 			os.print(output);
 			os.flush();
+		}catch (IOException e){
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -308,7 +312,7 @@ public class SimpleHttpClient {
 		/**
 		 * Constructor.
 		 *
-		 * @param url string for connect.
+		 * @param urlStr string for connect.
 		 */
 		private Builder(String urlStr){
 			this.urlStr = urlStr;
@@ -319,7 +323,7 @@ public class SimpleHttpClient {
 		 *
 		 * TODO staticをやめて単体テストのときにBuilderごと差し替え可能にする。
 		 *
-		 * @param url string for connect
+		 * @param urlStr string for connect
 		 * @return Builder instance.
 		 */
 		public static Builder simpleHttpClient(String urlStr){
@@ -343,8 +347,6 @@ public class SimpleHttpClient {
 		/**
 		 * methodをセットする。ビルダー。
 		 *
-		 *
-		 * @param url
 		 * @return
 		 */
 		public Builder withMethod(Method method){
@@ -361,7 +363,6 @@ public class SimpleHttpClient {
 		 * charsetをセットする。ビルダー。
 		 * 読み込み時/PostデータURLエンコード時のCharsetを指定します。
 		 *
-		 * @param url
 		 * @return
 		 */
 		public Builder withCharset(String charset){
@@ -374,7 +375,6 @@ public class SimpleHttpClient {
 		 * GETメソッドの時のQueryString。
 		 * urlの後ろに"?aaa=ccc"という形式で付加するのと同じ。
 		 *
-		 * @param url
 		 * @return
 		 */
 		public Builder withQuery(String query){
@@ -387,7 +387,6 @@ public class SimpleHttpClient {
 		 * POSTメソッドで渡すデータ。
 		 * outputをセットしたらメソッドは自動的にPOST
 		 *
-		 * @param url
 		 * @return
 		 */
 		public Builder withOutput(String output){
@@ -403,7 +402,6 @@ public class SimpleHttpClient {
 		 * 既にセット済みのデータがある場合は上書きされる。
 		 * デフォルトではUTF-8URLエンコードするので、charset変更の必要がある場合は setCharset(String)する。
 		 *
-		 * @param url
 		 * @return
 		 */
 		public Builder withOutput(Map<String, String> postParams){
@@ -415,7 +413,6 @@ public class SimpleHttpClient {
 		 * requetPropetriesをセットする。ビルダー。
 		 * {@link URLConnection#setRequestProperty(String, String)}でセットするプロパティ。
 		 *
-		 * @param url
 		 * @return
 		 */
 		public Builder withRequestProperties(Map<String, String> requestProperties){
@@ -427,7 +424,6 @@ public class SimpleHttpClient {
 		 * timeoutをセットする。ビルダー。
 		 * connectとreadのtimeout値。
 		 *
-		 * @param int timeout
 		 * @return
 		 */
 		public Builder withTimeout(int timeout){
